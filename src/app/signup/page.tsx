@@ -12,13 +12,13 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import GoogleIcon from "@mui/icons-material/Google";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import Divider from "@mui/material/Divider";
 
-export default function LoginPage() {
+export default function SignUpPage() {
     const { signInWithGoogle, signInWithGithub, user } = useAuth();
     const router = useRouter();
     const [error, setError] = React.useState<string | null>(null);
@@ -37,7 +37,7 @@ export default function LoginPage() {
         const password = data.get("password") as string;
 
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            await createUserWithEmailAndPassword(auth, email, password);
             router.push("/dashboard");
         } catch (err: any) {
             setError(err.message);
@@ -79,7 +79,7 @@ export default function LoginPage() {
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    Sign in
+                    Sign Up
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
                     <TextField
@@ -100,7 +100,7 @@ export default function LoginPage() {
                         label="Password"
                         type="password"
                         id="password"
-                        autoComplete="current-password"
+                        autoComplete="new-password"
                     />
                     {error && (
                         <Typography color="error" variant="body2" sx={{ mt: 1 }}>
@@ -113,7 +113,7 @@ export default function LoginPage() {
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
                     >
-                        Sign In
+                        Sign Up
                     </Button>
 
                     <Divider sx={{ my: 2 }}>OR</Divider>
@@ -125,7 +125,7 @@ export default function LoginPage() {
                         onClick={() => handleSocialLogin('google')}
                         sx={{ mb: 1 }}
                     >
-                        Sign in with Google
+                        Sign up with Google
                     </Button>
                     <Button
                         fullWidth
@@ -134,18 +134,13 @@ export default function LoginPage() {
                         onClick={() => handleSocialLogin('github')}
                         sx={{ mb: 2 }}
                     >
-                        Sign in with GitHub
+                        Sign up with GitHub
                     </Button>
 
-                    <Grid container>
-                        <Grid size="grow">
-                            <Link href="/forgot-password" variant="body2">
-                                Forgot password?
-                            </Link>
-                        </Grid>
+                    <Grid container justifyContent="flex-end">
                         <Grid>
-                            <Link href="/signup" variant="body2">
-                                {"Don't have an account? Sign Up"}
+                            <Link href="/login" variant="body2">
+                                Already have an account? Sign in
                             </Link>
                         </Grid>
                     </Grid>
