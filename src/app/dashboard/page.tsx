@@ -8,16 +8,31 @@ import ProfileBanner from "@/components/ProfileBanner";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
+import Button from "@mui/material/Button";
+import { sendEmailVerification } from "firebase/auth";
 
 export default function DashboardPage() {
     const { user, loading } = useAuth();
     const router = useRouter();
+    const [verificationSent, setVerificationSent] = React.useState(false);
 
     React.useEffect(() => {
         if (!loading && !user) {
             router.push("/login");
         }
     }, [user, loading, router]);
+
+    const handleResendVerification = async () => {
+        if (user) {
+            try {
+                await sendEmailVerification(user);
+                setVerificationSent(true);
+            } catch (error) {
+                console.error("Error sending verification email", error);
+            }
+        }
+    };
 
     if (loading) {
         return (
@@ -37,6 +52,25 @@ export default function DashboardPage() {
                 <Typography variant="h4" component="h1" gutterBottom>
                     Dashboard
                 </Typography>
+
+                {!user.emailVerified && (
+                    <Alert
+                        severity="warning"
+                        sx={{ mb: 2 }}
+                        action={
+                            !verificationSent && (
+                                <Button color="inherit" size="small" onClick={handleResendVerification}>
+                                    Resend Email
+                                </Button>
+                            )
+                        }
+                    >
+                        {verificationSent
+                            ? "Verification email sent! Please check your inbox."
+                            : "Your email is not verified. Please verify your email to access all features."}
+                    </Alert>
+                )}
+
                 <ProfileBanner />
                 <Typography variant="body1">
                     Welcome to your protected dashboard. Only authenticated users can see this page.
