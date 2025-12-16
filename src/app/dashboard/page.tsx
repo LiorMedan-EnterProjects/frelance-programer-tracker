@@ -11,17 +11,40 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import { sendEmailVerification } from "firebase/auth";
+import { getProjects, getTimeLogs, Project, TimeLog } from "@/lib/firestore";
+import DashboardStats from "@/components/dashboard/DashboardStats";
+import TimeLogList from "@/components/timer/TimeLogList";
 
 export default function DashboardPage() {
     const { user, loading } = useAuth();
     const router = useRouter();
     const [verificationSent, setVerificationSent] = React.useState(false);
+    const [projects, setProjects] = React.useState<Project[]>([]);
+    const [logs, setLogs] = React.useState<TimeLog[]>([]);
 
     React.useEffect(() => {
         if (!loading && !user) {
             router.push("/login");
         }
     }, [user, loading, router]);
+
+    React.useEffect(() => {
+        const fetchData = async () => {
+            if (user) {
+                try {
+                    const [projectsData, logsData] = await Promise.all([
+                        getProjects(user.uid),
+                        getTimeLogs(user.uid)
+                    ]);
+                    setProjects(projectsData);
+                    setLogs(logsData);
+                } catch (error) {
+                    console.error("Error fetching dashboard data:", error);
+                }
+            }
+        };
+        fetchData();
+    }, [user]);
 
     const handleResendVerification = async () => {
         if (user) {
@@ -72,9 +95,15 @@ export default function DashboardPage() {
                 )}
 
                 <ProfileBanner />
-                <Typography variant="body1">
-                    Welcome to your protected dashboard. Only authenticated users can see this page.
-                </Typography>
+
+                <Box sx={{ mt: 4 }}>
+                    <DashboardStats projects={projects} logs={logs} />
+
+                    <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
+                        Recent Activity
+                    </Typography>
+                    <TimeLogList logs={logs.slice(0, 5)} projects={projects} />
+                </Box>
             </Box>
         </Container>
     );

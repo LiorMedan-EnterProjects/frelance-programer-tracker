@@ -10,6 +10,7 @@ import {
     GithubAuthProvider
 } from "firebase/auth";
 import { auth, googleProvider, githubProvider } from "@/lib/firebase";
+import { createUserProfile } from "@/lib/firestore";
 
 interface AuthContextType {
     user: User | null;
@@ -37,11 +38,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const signInWithGoogle = async () => {
-        await signInWithPopup(auth, googleProvider);
+        const result = await signInWithPopup(auth, googleProvider);
+        if (result.user) {
+            await createUserProfile({
+                uid: result.user.uid,
+                email: result.user.email || '',
+                displayName: result.user.displayName || '',
+                photoURL: result.user.photoURL || '',
+                settings: { theme: 'system' }
+            });
+        }
     };
 
     const signInWithGithub = async () => {
-        await signInWithPopup(auth, githubProvider);
+        const result = await signInWithPopup(auth, githubProvider);
+        if (result.user) {
+            await createUserProfile({
+                uid: result.user.uid,
+                email: result.user.email || '',
+                displayName: result.user.displayName || '',
+                photoURL: result.user.photoURL || '',
+                settings: { theme: 'system' }
+            });
+        }
     };
 
     const logout = async () => {

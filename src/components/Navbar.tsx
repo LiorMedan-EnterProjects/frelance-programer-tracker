@@ -14,6 +14,7 @@ import Menu from "@mui/material/Menu";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import Avatar from "@mui/material/Avatar";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar() {
     const { user, logout } = useAuth();
@@ -52,8 +53,14 @@ export default function Navbar() {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1, cursor: 'pointer' }} onClick={() => router.push('/')}>
-                        Auth Starter
+                        Freelance Tracker
                     </Typography>
+                    {user && (
+                        <Box sx={{ display: { xs: 'none', md: 'flex' }, mr: 2 }}>
+                            <Button color="inherit" onClick={() => router.push('/projects')}>Projects</Button>
+                            <Button color="inherit" onClick={() => router.push('/timer')}>Timer</Button>
+                        </Box>
+                    )}
                     {user ? (
                         <div>
                             <IconButton
@@ -94,6 +101,7 @@ export default function Navbar() {
                             Login
                         </Button>
                     )}
+                    <ThemeToggle />
                 </Toolbar>
             </AppBar>
         </Box>
