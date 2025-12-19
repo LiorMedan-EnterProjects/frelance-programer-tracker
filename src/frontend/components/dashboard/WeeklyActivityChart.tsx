@@ -20,7 +20,7 @@ export default function WeeklyActivityChart({ data }: Props) {
             <Typography variant="h6" gutterBottom sx={{ textAlign: 'right' }}>
                 פעילות ב-7 הימים האחרונים
             </Typography>
-            <Box sx={{ flexGrow: 1, minHeight: 0, width: '100%' }}>
+            <Box sx={{ flexGrow: 1, minHeight: 0, width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}>
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                         data={data}

@@ -22,7 +22,7 @@ export default function HoursByProjectChart({ data, title }: Props) {
             <Typography variant="h6" gutterBottom sx={{ textAlign: 'right' }}>
                 {title || 'התפלגות נתונים'}
             </Typography>
-            <Box sx={{ flexGrow: 1, minHeight: 0, width: '100%', position: 'relative' }}>
+            <Box sx={{ flexGrow: 1, minHeight: 0, width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}>
                 {data.every(d => d.value === 0) ? (
                     <Box sx={{
                         display: 'flex',
