@@ -20,7 +20,7 @@ export default function ProfileBanner() {
             <Avatar
                 alt={user.displayName || "User"}
                 src={user.photoURL || undefined}
-                sx={{ width: 80, height: 80, mr: 3 }}
+                sx={{ width: 80, height: 80, ml: 3 }}
             />
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                 <CardContent sx={{ flex: '1 0 auto' }}>

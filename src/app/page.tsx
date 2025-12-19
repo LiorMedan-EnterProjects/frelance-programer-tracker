@@ -51,9 +51,11 @@ export default function HomePage() {
         <Box
           sx={{
             py: { xs: 8, md: 12 },
+            position: 'relative',
+            overflow: 'hidden',
             background: (theme) => theme.palette.mode === 'light'
-              ? 'linear-gradient(180deg, #EFF6FF 0%, #FFFFFF 100%)'
-              : 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)',
+              ? 'linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)'
+              : 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
           }}
         >
           <Container maxWidth="lg">
@@ -61,39 +63,35 @@ export default function HomePage() {
               <Typography
                 variant="h1"
                 sx={{
-                  fontSize: { xs: '2.5rem', md: '4rem' },
-                  background: (theme) => theme.palette.mode === 'light'
-                    ? '-webkit-linear-gradient(45deg, #2563eb 30%, #ec4899 90%)'
-                    : '-webkit-linear-gradient(45deg, #60a5fa 30%, #f472b6 90%)',
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  pb: 1, // Padding for g letters
+                  fontSize: { xs: '2.5rem', md: '5rem' },
+                  fontWeight: 800,
+                  lineHeight: 1.2,
+                  color: (theme) => theme.palette.mode === 'light' ? 'primary.main' : '#60A5FA',
+                  pb: 2,
                 }}
               >
-                Track Time. Manage Projects. <br /> Get Paid.
+                עקוב אחרי הזמן. נהל פרויקטים. <br />
+                <Box component="span" sx={{ color: 'text.primary' }}>קבל תשלום.</Box>
               </Typography>
-              <Typography variant="h5" color="text.secondary" maxWidth="md">
-                The ultimate tool for freelance developers to streamline their workflow,
-                track billable hours, and maximize productivity.
+              <Typography variant="h5" color="text.secondary" maxWidth="md" sx={{ fontSize: { xs: '1.2rem', md: '1.5rem' }, lineHeight: 1.6 }}>
+                הכלי האולטימטיבי למפתחים פרילנסרים לייעול זרימת העבודה, מעקב אחר שעות לחיוב ומקסום הפרודוקטיביות.
               </Typography>
-              <Stack direction="row" spacing={2} pt={2}>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} pt={4}>
                 <Button
                   variant="contained"
                   size="large"
                   onClick={() => router.push("/login")}
-                  sx={{ px: 4, py: 1.5, fontSize: '1.1rem' }}
+                  sx={{ px: 5, py: 1.5, fontSize: '1.2rem', borderRadius: 2 }}
                 >
-                  Get Started
+                  התחל עכשיו
                 </Button>
                 <Button
                   variant="outlined"
                   size="large"
-                  onClick={() => {
-                    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  sx={{ px: 4, py: 1.5, fontSize: '1.1rem' }}
+                  href="/#features"
+                  sx={{ px: 5, py: 1.5, fontSize: '1.2rem', borderRadius: 2 }}
                 >
-                  Learn More
+                  למד עוד
                 </Button>
               </Stack>
             </Stack>
@@ -101,42 +99,108 @@ export default function HomePage() {
         </Box>
 
         {/* Features Section */}
-        <Box id="features" sx={{ py: { xs: 8, md: 12 } }}>
+        <Box id="features" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.paper' }}>
           <Container maxWidth="lg">
-            <Typography variant="h2" align="center" mb={8}>
-              Everything you need to succeed
+            <Typography variant="h2" align="center" mb={8} fontWeight="bold" sx={{ fontSize: { xs: '2rem', md: '3rem' } }}>
+              כל מה שצריך בשביל להצליח
             </Typography>
             <Grid container spacing={4}>
-              {features.map((feature, index) => (
-                <Grid size={{ xs: 12, md: 4 }} key={index}>
-                  <Card
-                    sx={{
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      textAlign: 'center',
-                      p: 2,
-                      transition: 'transform 0.2s',
-                      '&:hover': {
-                        transform: 'translateY(-4px)',
-                      }
-                    }}
-                  >
-                    <Box sx={{ p: 2, bgcolor: 'action.hover', borderRadius: '50%', mb: 2 }}>
-                      {feature.icon}
-                    </Box>
-                    <CardContent>
-                      <Typography variant="h5" component="h3" gutterBottom fontWeight="600">
-                        {feature.title}
-                      </Typography>
-                      <Typography variant="body1" color="text.secondary">
-                        {feature.description}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
+              <Grid size={{ xs: 12, md: 4 }}>
+                <Card
+                  elevation={0}
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    textAlign: 'center',
+                    p: 4,
+                    bgcolor: 'background.default',
+                    borderRadius: 4,
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: 4
+                    }
+                  }}
+                >
+                  <Box sx={{ p: 2, bgcolor: 'primary.main', borderRadius: '50%', mb: 3, color: 'white' }}>
+                    <CheckCircleIcon fontSize="large" />
+                  </Box>
+                  <CardContent sx={{ p: 0 }}>
+                    <Typography variant="h5" component="h3" gutterBottom fontWeight="700" mb={2}>
+                      ניהול פרויקטים
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" lineHeight={1.6}>
+                      ארגן את הפרויקטים, הלקוחות והדדליינים במקום אחד.
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }}>
+                <Card
+                  elevation={0}
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    textAlign: 'center',
+                    p: 4,
+                    bgcolor: 'background.default',
+                    borderRadius: 4,
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: 4
+                    }
+                  }}
+                >
+                  <Box sx={{ p: 2, bgcolor: 'primary.main', borderRadius: '50%', mb: 3, color: 'white' }}>
+                    <AccessTimeIcon fontSize="large" />
+                  </Box>
+                  <CardContent sx={{ p: 0 }}>
+                    <Typography variant="h5" component="h3" gutterBottom fontWeight="700" mb={2}>
+                      מעקב שעות
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" lineHeight={1.6}>
+                      עקוב אחר שעות לחיוב בדיוק רב עם הטיימר המובנה שלנו.
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }}>
+                <Card
+                  elevation={0}
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    textAlign: 'center',
+                    p: 4,
+                    bgcolor: 'background.default',
+                    borderRadius: 4,
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: 4
+                    }
+                  }}
+                >
+                  <Box sx={{ p: 2, bgcolor: 'primary.main', borderRadius: '50%', mb: 3, color: 'white' }}>
+                    <MonetizationOnIcon fontSize="large" />
+                  </Box>
+                  <CardContent sx={{ p: 0 }}>
+                    <Typography variant="h5" component="h3" gutterBottom fontWeight="700" mb={2}>
+                      ניתוח רווחים
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" lineHeight={1.6}>
+                      הצג את ההכנסות שלך והבן אילו פרויקטים הם הרווחיים ביותר.
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
             </Grid>
           </Container>
         </Box>

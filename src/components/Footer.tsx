@@ -10,15 +10,15 @@ export default function Footer() {
         <Box component="footer" sx={{ py: 6, bgcolor: 'background.paper', borderTop: 1, borderColor: 'divider' }}>
             <Container maxWidth="lg">
                 <Typography variant="h6" align="center" gutterBottom>
-                    Freelance Tracker
+                    מעקב פרילנסרים
                 </Typography>
                 <Typography variant="subtitle1" align="center" color="text.secondary" component="p">
-                    Build better software, manage your time, and get paid.
+                    בנה תוכנה טובה יותר, נהל את הזמן שלך, וקבל תשלום.
                 </Typography>
                 <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 2 }}>
-                    {"Copyright © "}
+                    {"כל הזכויות שמורות © "}
                     <Link color="inherit" href="https://example.com/">
-                        Freelance Tracker
+                        מעקב פרילנסרים
                     </Link>{" "}
                     {new Date().getFullYear()}
                     {"."}

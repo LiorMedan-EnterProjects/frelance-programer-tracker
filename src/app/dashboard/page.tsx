@@ -11,40 +11,31 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import { sendEmailVerification } from "firebase/auth";
-import { getProjects, getTimeLogs, Project, TimeLog } from "@/lib/firestore";
+import { useData } from "@/context/DataContext";
 import DashboardStats from "@/components/dashboard/DashboardStats";
 import TimeLogList from "@/components/timer/TimeLogList";
+import HoursByProjectChart from "@/components/dashboard/HoursByProjectChart";
+import WeeklyActivityChart from "@/components/dashboard/WeeklyActivityChart";
+import { prepareProjectData, prepareWeeklyActivity } from "@/lib/chartUtils";
+import { Grid } from "@mui/material";
 
 export default function DashboardPage() {
     const { user, loading } = useAuth();
+    const { projects, logs } = useData();
+
+    // Filter out logs that belong to deleted projects
+    const activeLogs = React.useMemo(() => {
+        return logs.filter(log => projects.some(p => p.id === log.projectId));
+    }, [logs, projects]);
+
     const router = useRouter();
     const [verificationSent, setVerificationSent] = React.useState(false);
-    const [projects, setProjects] = React.useState<Project[]>([]);
-    const [logs, setLogs] = React.useState<TimeLog[]>([]);
 
     React.useEffect(() => {
         if (!loading && !user) {
             router.push("/login");
         }
     }, [user, loading, router]);
-
-    React.useEffect(() => {
-        const fetchData = async () => {
-            if (user) {
-                try {
-                    const [projectsData, logsData] = await Promise.all([
-                        getProjects(user.uid),
-                        getTimeLogs(user.uid)
-                    ]);
-                    setProjects(projectsData);
-                    setLogs(logsData);
-                } catch (error) {
-                    console.error("Error fetching dashboard data:", error);
-                }
-            }
-        };
-        fetchData();
-    }, [user]);
 
     const handleResendVerification = async () => {
         if (user) {
@@ -72,8 +63,8 @@ export default function DashboardPage() {
     return (
         <Container maxWidth="md">
             <Box sx={{ my: 4 }}>
-                <Typography variant="h4" component="h1" gutterBottom>
-                    Dashboard
+                <Typography variant="h4" component="h1" gutterBottom sx={{ textAlign: 'right' }}>
+                    לוח בקרה
                 </Typography>
 
                 {!user.emailVerified && (
@@ -83,26 +74,35 @@ export default function DashboardPage() {
                         action={
                             !verificationSent && (
                                 <Button color="inherit" size="small" onClick={handleResendVerification}>
-                                    Resend Email
+                                    שלח שוב
                                 </Button>
                             )
                         }
                     >
                         {verificationSent
-                            ? "Verification email sent! Please check your inbox."
-                            : "Your email is not verified. Please verify your email to access all features."}
+                            ? "מייל אימות נשלח! נא לבדוק את תיבת הדואר הנכנס."
+                            : "האימייל שלך לא מאומת. נא לאמת את המייל כדי לקבל גישה לכל הפיצ'רים."}
                     </Alert>
                 )}
 
                 <ProfileBanner />
 
                 <Box sx={{ mt: 4 }}>
-                    <DashboardStats projects={projects} logs={logs} />
+                    <DashboardStats projects={projects} logs={activeLogs} />
 
-                    <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
-                        Recent Activity
+                    <Grid container spacing={3} sx={{ mb: 4 }}>
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <WeeklyActivityChart data={React.useMemo(() => prepareWeeklyActivity(activeLogs), [activeLogs])} />
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <HoursByProjectChart data={React.useMemo(() => prepareProjectData(projects, activeLogs), [projects, activeLogs])} />
+                        </Grid>
+                    </Grid>
+
+                    <Typography variant="h5" gutterBottom sx={{ mt: 4, textAlign: 'right' }}>
+                        פעילות אחרונה
                     </Typography>
-                    <TimeLogList logs={logs.slice(0, 5)} projects={projects} />
+                    <TimeLogList logs={activeLogs.slice(0, 5)} projects={projects} />
                 </Box>
             </Box>
         </Container>

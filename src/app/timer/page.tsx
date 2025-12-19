@@ -40,21 +40,21 @@ export default function TimerPage() {
 
     return (
         <Container maxWidth="lg" sx={{ py: 4 }}>
-            <Typography variant="h4" component="h1" gutterBottom>
-                Time Tracking
+            <Typography variant="h4" component="h1" gutterBottom sx={{ textAlign: 'right' }}>
+                מעקב שעות
             </Typography>
 
             <Grid container spacing={4}>
-                <Grid item xs={12} md={6}>
-                    <Typography variant="h6" gutterBottom>Timer</Typography>
+                <Grid size={{ xs: 12, md: 6 }}>
+                    <Typography variant="h6" gutterBottom sx={{ textAlign: 'right' }}>שעון</Typography>
                     <Timer
                         projects={projects}
                         userId={user.uid}
                         onLogAdded={fetchData}
                     />
                 </Grid>
-                <Grid item xs={12} md={6}>
-                    <Typography variant="h6" gutterBottom>Recent Activity</Typography>
+                <Grid size={{ xs: 12, md: 6 }}>
+                    <Typography variant="h6" gutterBottom sx={{ textAlign: 'right' }}>פעילות אחרונה</Typography>
                     <TimeLogList logs={logs} projects={projects} />
                 </Grid>
             </Grid>

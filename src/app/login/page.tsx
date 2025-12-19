@@ -56,11 +56,11 @@ export default function LoginPage() {
         } catch (err: any) {
             console.error("Social login error:", err);
             if (err.code === 'auth/account-exists-with-different-credential') {
-                setError("An account with this email already exists. Please sign in with the provider you used originally (e.g., Google or Email).");
+                setError("חשבון עם אימייל זה כבר קיים. אנא התחבר דרך הספק שבו השתמשת לראשונה (למשל Google או אימייל).");
             } else if (err.code === 'auth/popup-closed-by-user') {
-                setError("Sign-in popup was closed before completion.");
+                setError("חלון ההתחברות נסגר לפני סיום התהליך.");
             } else {
-                setError("Failed to sign in. Please try again.");
+                setError("ההתחברות נכשלה. אנא נסה שוב.");
             }
         }
     };
@@ -79,7 +79,7 @@ export default function LoginPage() {
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    Sign in
+                    התחברות
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
                     <TextField
@@ -87,20 +87,22 @@ export default function LoginPage() {
                         required
                         fullWidth
                         id="email"
-                        label="Email Address"
+                        label="כתובת אימייל"
                         name="email"
                         autoComplete="email"
                         autoFocus
+                        sx={{ textAlign: 'right', '& .MuiInputLabel-root': { right: 28, left: 'auto', transformOrigin: 'top right' } }}
                     />
                     <TextField
                         margin="normal"
                         required
                         fullWidth
                         name="password"
-                        label="Password"
+                        label="סיסמה"
                         type="password"
                         id="password"
                         autoComplete="current-password"
+                        sx={{ textAlign: 'right', '& .MuiInputLabel-root': { right: 28, left: 'auto', transformOrigin: 'top right' } }}
                     />
                     {error && (
                         <Typography color="error" variant="body2" sx={{ mt: 1 }}>
@@ -113,10 +115,10 @@ export default function LoginPage() {
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
                     >
-                        Sign In
+                        התחבר
                     </Button>
 
-                    <Divider sx={{ my: 2 }}>OR</Divider>
+                    <Divider sx={{ my: 2 }}>או</Divider>
 
                     <Button
                         fullWidth
@@ -125,7 +127,7 @@ export default function LoginPage() {
                         onClick={() => handleSocialLogin('google')}
                         sx={{ mb: 1 }}
                     >
-                        Sign in with Google
+                        התחבר עם Google
                     </Button>
                     <Button
                         fullWidth
@@ -134,18 +136,18 @@ export default function LoginPage() {
                         onClick={() => handleSocialLogin('github')}
                         sx={{ mb: 2 }}
                     >
-                        Sign in with GitHub
+                        התחבר עם GitHub
                     </Button>
 
                     <Grid container>
                         <Grid size="grow">
                             <Link href="/forgot-password" variant="body2">
-                                Forgot password?
+                                שכחת סיסמה?
                             </Link>
                         </Grid>
                         <Grid>
                             <Link href="/signup" variant="body2">
-                                {"Don't have an account? Sign Up"}
+                                {"אין לך חשבון? הירשם"}
                             </Link>
                         </Grid>
                     </Grid>

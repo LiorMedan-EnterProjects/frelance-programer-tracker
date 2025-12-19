@@ -12,7 +12,7 @@ export default function ThemeToggle() {
     const { toggleColorMode } = useThemeContext();
 
     return (
-        <Tooltip title={theme.palette.mode === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}>
+        <Tooltip title={theme.palette.mode === 'dark' ? "עבור למצב אור" : "עבור למצב חושך"}>
             <IconButton sx={{ ml: 1 }} onClick={toggleColorMode} color="inherit">
                 {theme.palette.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
             </IconButton>

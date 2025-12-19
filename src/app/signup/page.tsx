@@ -56,11 +56,11 @@ export default function SignUpPage() {
         } catch (err: any) {
             console.error("Social login error:", err);
             if (err.code === 'auth/account-exists-with-different-credential') {
-                setError("An account with this email already exists. Please sign in with the provider you used originally (e.g., Google or Email).");
+                setError("חשבון עם אימייל זה כבר קיים. אנא התחבר דרך הספק שבו השתמשת לראשונה (למשל Google או אימייל).");
             } else if (err.code === 'auth/popup-closed-by-user') {
-                setError("Sign-in popup was closed before completion.");
+                setError("חלון ההרשמה נסגר לפני סיום התהליך.");
             } else {
-                setError("Failed to sign in. Please try again.");
+                setError("ההרשמה נכשלה. אנא נסה שוב.");
             }
         }
     };
@@ -79,7 +79,7 @@ export default function SignUpPage() {
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    Sign Up
+                    הרשמה
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
                     <TextField
@@ -87,20 +87,22 @@ export default function SignUpPage() {
                         required
                         fullWidth
                         id="email"
-                        label="Email Address"
+                        label="כתובת אימייל"
                         name="email"
                         autoComplete="email"
                         autoFocus
+                        sx={{ textAlign: 'right', '& .MuiInputLabel-root': { right: 28, left: 'auto', transformOrigin: 'top right' } }}
                     />
                     <TextField
                         margin="normal"
                         required
                         fullWidth
                         name="password"
-                        label="Password"
+                        label="סיסמה"
                         type="password"
                         id="password"
                         autoComplete="new-password"
+                        sx={{ textAlign: 'right', '& .MuiInputLabel-root': { right: 28, left: 'auto', transformOrigin: 'top right' } }}
                     />
                     {error && (
                         <Typography color="error" variant="body2" sx={{ mt: 1 }}>
@@ -113,10 +115,10 @@ export default function SignUpPage() {
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
                     >
-                        Sign Up
+                        הירשם
                     </Button>
 
-                    <Divider sx={{ my: 2 }}>OR</Divider>
+                    <Divider sx={{ my: 2 }}>או</Divider>
 
                     <Button
                         fullWidth
@@ -125,7 +127,7 @@ export default function SignUpPage() {
                         onClick={() => handleSocialLogin('google')}
                         sx={{ mb: 1 }}
                     >
-                        Sign up with Google
+                        הירשם עם Google
                     </Button>
                     <Button
                         fullWidth
@@ -134,13 +136,13 @@ export default function SignUpPage() {
                         onClick={() => handleSocialLogin('github')}
                         sx={{ mb: 2 }}
                     >
-                        Sign up with GitHub
+                        הירשם עם GitHub
                     </Button>
 
                     <Grid container justifyContent="flex-end">
                         <Grid>
                             <Link href="/login" variant="body2">
-                                Already have an account? Sign in
+                                יש לך כבר חשבון? התחבר
                             </Link>
                         </Grid>
                     </Grid>

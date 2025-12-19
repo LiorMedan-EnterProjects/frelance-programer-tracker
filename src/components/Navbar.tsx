@@ -2,23 +2,33 @@
 
 import * as React from "react";
 import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import AccountCircle from "@mui/icons-material/AccountCircle";
-import MenuItem from "@mui/material/MenuItem";
-import Menu from "@mui/material/Menu";
-import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
 import Avatar from "@mui/material/Avatar";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import LogoutIcon from "@mui/icons-material/Logout";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import LoginIcon from "@mui/icons-material/Login";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter, usePathname } from "next/navigation";
 import ThemeToggle from "./ThemeToggle";
+import { useTheme } from "@mui/material/styles";
 
 export default function Navbar() {
     const { user, logout } = useAuth();
     const router = useRouter();
+    const pathname = usePathname();
+    const theme = useTheme();
+
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -39,30 +49,67 @@ export default function Navbar() {
         router.push("/login");
     };
 
+    const navItems = [
+        { label: "לוח בקרה", path: "/dashboard", icon: <DashboardIcon sx={{ marginBottom: "0px !important", marginRight: 1 }} /> },
+        { label: "פרויקטים", path: "/projects", icon: <AssignmentIcon sx={{ marginBottom: "0px !important", marginRight: 1 }} /> },
+        { label: "שעון", path: "/timer", icon: <AccessTimeIcon sx={{ marginBottom: "0px !important", marginRight: 1 }} /> },
+    ];
+
+    // Determine active tab
+    const currentTab = navItems.findIndex(item => pathname === item.path);
+    const value = currentTab !== -1 ? currentTab : false;
+
     return (
-        <Box sx={{ flexGrow: 1 }}>
-            <AppBar position="static">
-                <Toolbar>
-                    <IconButton
-                        size="large"
-                        edge="start"
-                        color="inherit"
-                        aria-label="menu"
-                        sx={{ mr: 2 }}
+        <AppBar position="sticky" color="default" elevation={1} dir="rtl" sx={{ bgcolor: 'background.paper', backgroundImage: 'none' }}>
+            <Toolbar sx={{ justifyContent: 'space-between' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Typography
+                        variant="h6"
+                        noWrap
+                        component="div"
+                        sx={{
+                            ml: 4,
+                            fontWeight: 'bold',
+                            color: 'primary.main',
+                            cursor: 'pointer'
+                        }}
+                        onClick={() => router.push('/')}
                     >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1, cursor: 'pointer' }} onClick={() => router.push('/')}>
-                        Freelance Tracker
+                        מעקב פרילנסרים
                     </Typography>
+
                     {user && (
-                        <Box sx={{ display: { xs: 'none', md: 'flex' }, mr: 2 }}>
-                            <Button color="inherit" onClick={() => router.push('/projects')}>Projects</Button>
-                            <Button color="inherit" onClick={() => router.push('/timer')}>Timer</Button>
-                        </Box>
+                        <Tabs
+                            value={value}
+                            aria-label="navigation tabs"
+                            sx={{
+                                '& .MuiTab-root': {
+                                    minHeight: 64,
+                                    fontSize: '1rem',
+                                    fontWeight: 500,
+                                    flexDirection: 'row',
+                                    gap: 1
+                                }
+                            }}
+                        >
+                            {navItems.map((item) => (
+                                <Tab
+                                    key={item.path}
+                                    label={item.label}
+                                    icon={item.icon}
+                                    iconPosition="start"
+                                    onClick={() => router.push(item.path)}
+                                />
+                            ))}
+                        </Tabs>
                     )}
+                </Box>
+
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <ThemeToggle />
+
                     {user ? (
-                        <div>
+                        <>
                             <IconButton
                                 size="large"
                                 aria-label="account of current user"
@@ -70,40 +117,54 @@ export default function Navbar() {
                                 aria-haspopup="true"
                                 onClick={handleMenu}
                                 color="inherit"
+                                sx={{ ml: 1 }}
                             >
-                                {user.photoURL ? (
-                                    <Avatar alt={user.displayName || "User"} src={user.photoURL} />
-                                ) : (
-                                    <AccountCircle />
-                                )}
+                                <Avatar
+                                    src={user.photoURL || undefined}
+                                    sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}
+                                >
+                                    {user.displayName?.charAt(0) || <AccountCircleIcon />}
+                                </Avatar>
                             </IconButton>
                             <Menu
                                 id="menu-appbar"
                                 anchorEl={anchorEl}
                                 anchorOrigin={{
-                                    vertical: "top",
-                                    horizontal: "right",
+                                    vertical: 'bottom',
+                                    horizontal: 'left', // RTL: left aligns to the visual right side of element usually
                                 }}
                                 keepMounted
                                 transformOrigin={{
-                                    vertical: "top",
-                                    horizontal: "right",
+                                    vertical: 'top',
+                                    horizontal: 'left',
                                 }}
                                 open={Boolean(anchorEl)}
                                 onClose={handleClose}
                             >
-                                <MenuItem onClick={() => { handleClose(); router.push('/dashboard'); }}>Profile</MenuItem>
-                                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                                <MenuItem disabled>
+                                    <Typography variant="body2" fontWeight="bold">
+                                        {user.displayName || 'משתמש'}
+                                    </Typography>
+                                </MenuItem>
+                                <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+                                    <LogoutIcon fontSize="small" sx={{ ml: 1 }} />
+                                    התנתק
+                                </MenuItem>
                             </Menu>
-                        </div>
+                        </>
                     ) : (
-                        <Button color="inherit" onClick={handleLogin}>
-                            Login
+                        <Button
+                            color="primary"
+                            variant="contained"
+                            startIcon={<LoginIcon sx={{ ml: 1 }} />}
+                            onClick={handleLogin}
+                            sx={{ borderRadius: 2 }}
+                        >
+                            התחברות
                         </Button>
                     )}
-                    <ThemeToggle />
-                </Toolbar>
-            </AppBar>
-        </Box>
+                </Box>
+            </Toolbar>
+        </AppBar>
     );
 }

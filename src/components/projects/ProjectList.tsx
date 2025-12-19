@@ -24,7 +24,7 @@ export default function ProjectList({ projects, onDelete, onEdit }: ProjectListP
     if (projects.length === 0) {
         return (
             <Typography variant="body1" color="text.secondary" align="center" sx={{ mt: 4 }}>
-                No projects found. Start by creating one!
+                לא נמצאו פרויקטים. צור אחד חדש כדי להתחיל!
             </Typography>
         );
     }
@@ -37,7 +37,7 @@ export default function ProjectList({ projects, onDelete, onEdit }: ProjectListP
                         secondaryAction={
                             <Box>
                                 {onEdit && (
-                                    <IconButton edge="end" aria-label="edit" onClick={() => onEdit(project)} sx={{ mr: 1 }}>
+                                    <IconButton edge="end" aria-label="edit" onClick={() => onEdit(project)} sx={{ ml: 1 }}>
                                         <EditIcon />
                                     </IconButton>
                                 )}
@@ -52,7 +52,7 @@ export default function ProjectList({ projects, onDelete, onEdit }: ProjectListP
                             height: 12,
                             borderRadius: '50%',
                             bgcolor: project.color,
-                            mr: 2,
+                            ml: 2, // RTL margin fix
                             flexShrink: 0
                         }} />
                         <ListItemText
@@ -60,7 +60,7 @@ export default function ProjectList({ projects, onDelete, onEdit }: ProjectListP
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <Typography variant="h6">{project.name}</Typography>
                                     <Chip
-                                        label={project.status}
+                                        label={project.status === 'active' ? 'פעיל' : project.status === 'completed' ? 'הושלם' : 'בארכיון'}
                                         size="small"
                                         color={project.status === 'active' ? 'success' : project.status === 'completed' ? 'default' : 'warning'}
                                         variant="outlined"
@@ -72,9 +72,10 @@ export default function ProjectList({ projects, onDelete, onEdit }: ProjectListP
                                     <Typography component="span" variant="body2" color="text.primary">
                                         {project.client}
                                     </Typography>
-                                    {` — $${project.hourlyRate}/hr`}
+                                    {` — ₪${project.hourlyRate}/שעה`}
                                 </>
                             }
+                            sx={{ textAlign: 'right' }}
                         />
                     </ListItem>
                 </Paper>

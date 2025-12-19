@@ -13,7 +13,7 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-    mode: 'light',
+    mode: 'dark',
     toggleColorMode: () => { },
 });
 
@@ -22,14 +22,15 @@ export const useThemeContext = () => useContext(ThemeContext);
 export const ColorModeProvider = ({ children }: { children: ReactNode }) => {
     // Use a separate mounted state to handle hydration mismatch
     const [mounted, setMounted] = useState(false);
-    const [mode, setMode] = useState<'light' | 'dark'>('light');
+    const [mode, setMode] = useState<'light' | 'dark'>('dark');
 
     useEffect(() => {
         setMounted(true);
+        // Force dark mode default if not set
         const savedMode = localStorage.getItem('themeMode') as 'light' | 'dark';
         if (savedMode) {
             setMode(savedMode);
-        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        } else {
             setMode('dark');
         }
     }, []);

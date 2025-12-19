@@ -24,11 +24,9 @@ export default function ProjectForm({ onSubmit, initialData }: ProjectFormProps)
     const [hourlyRate, setHourlyRate] = useState(initialData?.hourlyRate?.toString() || '');
     const [status, setStatus] = useState<Project['status']>(initialData?.status || 'active');
     const [color, setColor] = useState(initialData?.color || '#3f51b5');
-    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
         try {
             await onSubmit({
                 name,
@@ -47,48 +45,98 @@ export default function ProjectForm({ onSubmit, initialData }: ProjectFormProps)
             }
         } catch (error) {
             console.error("Error submitting project:", error);
-        } finally {
-            setLoading(false);
         }
     };
 
     return (
         <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2, border: '1px solid #ddd', borderRadius: 2 }}>
             <TextField
-                label="Project Name"
+                label="שם הפרויקט"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
                 fullWidth
+                sx={{
+                    '& .MuiInputLabel-root': {
+                        width: '100%',
+                        textAlign: 'center',
+                        transformOrigin: 'center',
+                        left: '0 !important',
+                        right: '0 !important'
+                    },
+                    '& .MuiInputLabel-shrink': {
+                        transform: 'translate(0, -1.5px) scale(0.75)',
+                        maxWidth: '100%'
+                    }
+                }}
+                inputProps={{ style: { textAlign: 'center' } }}
             />
             <TextField
-                label="Client Name"
+                label="שם הלקוח"
                 value={client}
                 onChange={(e) => setClient(e.target.value)}
                 fullWidth
+                sx={{
+                    '& .MuiInputLabel-root': {
+                        width: '100%',
+                        textAlign: 'center',
+                        transformOrigin: 'center',
+                        left: '0 !important',
+                        right: '0 !important'
+                    },
+                    '& .MuiInputLabel-shrink': {
+                        transform: 'translate(0, -1.5px) scale(0.75)',
+                        maxWidth: '100%'
+                    }
+                }}
+                inputProps={{ style: { textAlign: 'center' } }}
             />
             <TextField
-                label="Hourly Rate"
+                label="תעריף שעתי"
                 type="number"
                 value={hourlyRate}
                 onChange={(e) => setHourlyRate(e.target.value)}
                 fullWidth
-                slotProps={{ htmlInput: { min: 0, step: 0.01 } }}
+                slotProps={{ htmlInput: { min: 0, step: 0.01, style: { textAlign: 'center' } } }}
+                sx={{
+                    '& .MuiInputLabel-root': {
+                        width: '100%',
+                        textAlign: 'center',
+                        transformOrigin: 'center',
+                        left: '0 !important',
+                        right: '0 !important'
+                    },
+                    '& .MuiInputLabel-shrink': {
+                        transform: 'translate(0, -1.5px) scale(0.75)',
+                        maxWidth: '100%'
+                    }
+                }}
             />
             <FormControl fullWidth>
-                <InputLabel>Status</InputLabel>
+                <InputLabel sx={{
+                    width: '100%',
+                    textAlign: 'center',
+                    transformOrigin: 'center',
+                    left: '0 !important',
+                    right: '0 !important',
+                    '&.MuiInputLabel-shrink': {
+                        transform: 'translate(0, -1.5px) scale(0.75)',
+                        maxWidth: '100%'
+                    }
+                }}>סטטוס</InputLabel>
                 <Select
                     value={status}
-                    label="Status"
+                    label="סטטוס"
                     onChange={(e) => setStatus(e.target.value as Project['status'])}
+                    sx={{ textAlign: 'center' }}
                 >
-                    <MenuItem value="active">Active</MenuItem>
-                    <MenuItem value="completed">Completed</MenuItem>
-                    <MenuItem value="archived">Archived</MenuItem>
+                    <MenuItem value="active" sx={{ justifyContent: 'center' }}>פעיל</MenuItem>
+                    <MenuItem value="completed" sx={{ justifyContent: 'center' }}>הושלם</MenuItem>
+                    <MenuItem value="archived" sx={{ justifyContent: 'center' }}>בארכיון</MenuItem>
                 </Select>
             </FormControl>
-            <Stack direction="row" alignItems="center" spacing={2}>
-                <InputLabel>Color Code</InputLabel>
+            <Stack direction="row" alignItems="center" justifyContent="center" spacing={2}>
+                <InputLabel>צבע</InputLabel>
                 <input
                     type="color"
                     value={color}
@@ -99,10 +147,10 @@ export default function ProjectForm({ onSubmit, initialData }: ProjectFormProps)
             <Button
                 type="submit"
                 variant="contained"
-                disabled={loading}
+                // disabled={loading} // Removed loading state
                 fullWidth
             >
-                {loading ? 'Saving...' : (initialData ? 'Update Project' : 'Create Project')}
+                {initialData ? 'עדכן פרויקט' : 'צור פרויקט'}
             </Button>
         </Box>
     );

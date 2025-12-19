@@ -27,19 +27,19 @@ export default function ForgotPasswordPage() {
         const email = data.get("email") as string;
 
         if (!email) {
-            setError("Please enter your email address.");
+            setError("אנא הזן את כתובת האימייל שלך.");
             return;
         }
 
         try {
             await sendPasswordResetEmail(auth, email);
-            setMessage("Password reset link sent! Check your inbox.");
+            setMessage("קישור לאיפוס סיסמה נשלח! בדוק את תיבת הדואר הנכנס שלך.");
         } catch (err: any) {
             console.error("Reset password error:", err);
             if (err.code === 'auth/user-not-found') {
-                setError("No account found with this email.");
+                setError("לא נמצא חשבון עם כתובת אימייל זו.");
             } else {
-                setError("Failed to send reset link. Please try again.");
+                setError("שליחת הקישור נכשלה. אנא נסה שוב.");
             }
         }
     };
@@ -58,21 +58,22 @@ export default function ForgotPasswordPage() {
                     <LockResetIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    Reset Password
+                    איפוס סיסמה
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
                     <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 2 }}>
-                        Enter your email address and we'll send you a link to reset your password.
+                        הזן את כתובת האימייל שלך ונשלח לך קישור לאיפוס הסיסמה.
                     </Typography>
                     <TextField
                         margin="normal"
                         required
                         fullWidth
                         id="email"
-                        label="Email Address"
+                        label="כתובת אימייל"
                         name="email"
                         autoComplete="email"
                         autoFocus
+                        sx={{ textAlign: 'right', '& .MuiInputLabel-root': { right: 28, left: 'auto', transformOrigin: 'top right' } }}
                     />
                     {error && (
                         <Typography color="error" variant="body2" sx={{ mt: 1 }}>
@@ -90,12 +91,12 @@ export default function ForgotPasswordPage() {
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
                     >
-                        Send Reset Link
+                        שלח קישור לאיפוס
                     </Button>
                     <Grid container justifyContent="flex-end">
                         <Grid>
                             <Link href="/login" variant="body2">
-                                Back to Login
+                                חזרה להתחברות
                             </Link>
                         </Grid>
                     </Grid>

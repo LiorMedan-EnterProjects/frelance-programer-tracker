@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+import { Heebo } from "next/font/google";
 import ThemeRegistry from "@/components/ThemeRegistry/ThemeRegistry";
 import { AuthProvider } from "@/context/AuthContext";
-import Navbar from "@/components/Navbar";
+import { ColorModeProvider } from "@/context/ThemeContext";
+import { DataProvider } from "@/context/DataContext";
+import AppShell from "@/components/AppShell";
 
-const inter = Inter({ subsets: ["latin"] });
+const heebo = Heebo({ subsets: ["hebrew", "latin"] });
 
 export const metadata: Metadata = {
-  title: "Firebase Auth Starter",
-  description: "Next.js + Firebase + MUI Starter",
+  title: "Freelance Tracker",
+  description: "Track your projects and time efficiently",
 };
 
 export default function RootLayout({
@@ -18,12 +19,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="he" dir="rtl">
+      <body className={heebo.className}>
         <AuthProvider>
           <ThemeRegistry>
-            <Navbar />
-            {children}
+            <ColorModeProvider>
+              <DataProvider>
+                <AppShell>
+                  {children}
+                </AppShell>
+              </DataProvider>
+            </ColorModeProvider>
           </ThemeRegistry>
         </AuthProvider>
       </body>

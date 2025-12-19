@@ -29,7 +29,7 @@ export default function DashboardStats({ projects, logs }: DashboardStatsProps) 
                 borderRadius: 2,
                 bgcolor: `${color}.light`,
                 color: `${color}.main`,
-                mr: 2,
+                ml: 2, // RTL: margin left instead of right
                 display: 'flex'
             }}>
                 {icon}
@@ -43,25 +43,25 @@ export default function DashboardStats({ projects, logs }: DashboardStatsProps) 
 
     return (
         <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={4}>
+            <Grid size={{ xs: 12, sm: 4 }}>
                 <StatCard
-                    title="Total Earnings"
-                    value={`$${totalEarnings.toFixed(2)}`}
+                    title="סה״כ רווחים"
+                    value={`₪${totalEarnings.toFixed(2)}`}
                     icon={<AttachMoneyIcon fontSize="large" />}
                     color="success"
                 />
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid size={{ xs: 12, sm: 4 }}>
                 <StatCard
-                    title="Total Hours"
-                    value={`${totalHours.toFixed(1)}h`}
+                    title="סה״כ שעות"
+                    value={`${totalHours.toFixed(1)} ש'`}
                     icon={<AccessTimeIcon fontSize="large" />}
                     color="primary"
                 />
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid size={{ xs: 12, sm: 4 }}>
                 <StatCard
-                    title="Active Projects"
+                    title="פרויקטים פעילים"
                     value={activeProjects}
                     icon={<AssignmentIcon fontSize="large" />}
                     color="warning"
