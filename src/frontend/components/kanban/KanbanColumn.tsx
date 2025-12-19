@@ -14,21 +14,12 @@ interface KanbanColumnProps {
     tasks: Task[];
     color: string;
     onEditTask?: (task: Task) => void;
-    onAddTask?: (status: 'todo' | 'in-progress' | 'done', name: string) => Promise<void>;
+    onAddTask?: () => void;
 }
 
 export default function KanbanColumn({ id, title, tasks, color, onEditTask, onAddTask }: KanbanColumnProps) {
     const { setNodeRef } = useDroppable({ id });
     const theme = useTheme();
-    const [isAdding, setIsAdding] = useState(false);
-    const [newTaskName, setNewTaskName] = useState("");
-
-    const handleQuickAdd = async () => {
-        if (!newTaskName.trim() || !onAddTask) return;
-        await onAddTask(id, newTaskName);
-        setNewTaskName("");
-        setIsAdding(false);
-    };
 
     return (
         <Paper
@@ -112,43 +103,21 @@ export default function KanbanColumn({ id, title, tasks, color, onEditTask, onAd
                 </SortableContext>
             </Box>
 
-            {/* Quick Add Footer */}
+            {/* Add Task Button */}
             {onAddTask && (
                 <Box sx={{ p: 2, borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}` }}>
-                    {isAdding ? (
-                        <Box component="form" onSubmit={(e) => { e.preventDefault(); handleQuickAdd(); }}>
-                            <TextField
-                                fullWidth
-                                size="small"
-                                placeholder="שם המשימה..."
-                                value={newTaskName}
-                                onChange={(e) => setNewTaskName(e.target.value)}
-                                autoFocus
-                                onBlur={() => !newTaskName && setIsAdding(false)}
-                                sx={{
-                                    mb: 1,
-                                    '& .MuiOutlinedInput-root': { bgcolor: 'background.paper' }
-                                }}
-                            />
-                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                                <Button size="small" onClick={() => setIsAdding(false)}>ביטול</Button>
-                                <Button size="small" variant="contained" type="submit" disabled={!newTaskName.trim()}>הוסף</Button>
-                            </Box>
-                        </Box>
-                    ) : (
-                        <Button
-                            fullWidth
-                            startIcon={<AddIcon />}
-                            onClick={() => setIsAdding(true)}
-                            sx={{
-                                justifyContent: 'flex-start',
-                                color: 'text.secondary',
-                                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), color: 'primary.main' }
-                            }}
-                        >
-                            הוסף משימה
-                        </Button>
-                    )}
+                    <Button
+                        fullWidth
+                        startIcon={<AddIcon />}
+                        onClick={onAddTask}
+                        sx={{
+                            justifyContent: 'flex-start',
+                            color: 'text.secondary',
+                            '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), color: 'primary.main' }
+                        }}
+                    >
+                        הוסף משימה
+                    </Button>
                 </Box>
             )}
         </Paper>

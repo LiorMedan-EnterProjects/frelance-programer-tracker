@@ -19,15 +19,19 @@ import {
     DialogContent,
     DialogActions,
     IconButton,
-    Tooltip
+    Tooltip,
+    Divider
 } from '@mui/material';
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 import StopRoundedIcon from '@mui/icons-material/StopRounded';
 import EditCalendarRoundedIcon from '@mui/icons-material/EditCalendarRounded';
 import CloseIcon from '@mui/icons-material/Close';
+import AddIcon from '@mui/icons-material/Add';
 import { Project, addTimeLog, getProjectTasks, Task } from '@/backend/firestore';
 import { Timestamp } from 'firebase/firestore';
 import { keyframes } from '@emotion/react';
+import ProjectModal from '../projects/ProjectModal';
+import { useData } from '../../context/DataContext';
 
 // ... keyframes (pulse, pulseDark) ...
 const pulse = keyframes`
@@ -48,8 +52,12 @@ interface TimerProps {
     onLogAdded: () => void;
 }
 
-export default function Timer({ projects, userId, onLogAdded }: TimerProps) {
+export default function Timer({ projects: propProjects, userId, onLogAdded }: TimerProps) {
     const theme = useTheme();
+    const { createNewProject, projects: contextProjects } = useData(); // Use context for actions, props for data fallback
+    // Prefer context projects if available to ensure sync after creation
+    const projects = contextProjects.length > 0 ? contextProjects : propProjects;
+
     const [selectedProject, setSelectedProject] = useState('');
     const [tasks, setTasks] = useState<Task[]>([]);
     const [selectedTaskId, setSelectedTaskId] = useState('');
@@ -64,6 +72,9 @@ export default function Timer({ projects, userId, onLogAdded }: TimerProps) {
     const [manualDate, setManualDate] = useState(new Date().toISOString().split('T')[0]);
     const [manualStartTime, setManualStartTime] = useState('09:00');
     const [manualEndTime, setManualEndTime] = useState('10:00');
+
+    // Create Project State
+    const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
     useEffect(() => {
         return () => {
@@ -158,6 +169,28 @@ export default function Timer({ projects, userId, onLogAdded }: TimerProps) {
         }
     };
 
+    const handleProjectChange = (e: any) => {
+        const value = e.target.value;
+        if (value === '__NEW_PROJECT__') {
+            setIsProjectModalOpen(true);
+        } else {
+            setSelectedProject(value);
+        }
+    };
+
+    const handleCreateProject = async (projectData: any) => {
+        try {
+            await createNewProject(projectData);
+            setIsProjectModalOpen(false);
+            // Optionally select the new project if we could get its ID,
+            // but createNewProject might handle state updates async.
+            // For now, user will see it in the list and can select it.
+            // If createNewProject returns the ID, we could select it.
+        } catch (error) {
+            console.error("Error creating project:", error);
+        }
+    };
+
     const formatTime = (seconds: number) => {
         const h = Math.floor(seconds / 3600);
         const m = Math.floor((seconds % 3600) / 60);
@@ -198,12 +231,17 @@ export default function Timer({ projects, userId, onLogAdded }: TimerProps) {
                     <Select
                         value={selectedProject}
                         label="פרויקט"
-                        onChange={(e) => setSelectedProject(e.target.value)}
+                        onChange={handleProjectChange}
                         disabled={isRunning}
                     >
                         {projects.map((p) => (
                             <MenuItem key={p.id} value={p.id}>{p.name}</MenuItem>
                         ))}
+                        <Divider />
+                        <MenuItem value="__NEW_PROJECT__" sx={{ color: 'primary.main', fontWeight: 'bold' }}>
+                            <AddIcon fontSize="small" sx={{ mr: 1 }} />
+                            פרויקט חדש
+                        </MenuItem>
                     </Select>
                 </FormControl>
 
@@ -346,6 +384,13 @@ export default function Timer({ projects, userId, onLogAdded }: TimerProps) {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            {/* Quick Create Project Modal */}
+            <ProjectModal
+                open={isProjectModalOpen}
+                onClose={() => setIsProjectModalOpen(false)}
+                onSave={handleCreateProject}
+            />
         </Paper>
     );
 }

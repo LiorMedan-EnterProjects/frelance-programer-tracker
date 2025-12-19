@@ -9,20 +9,22 @@ import {
     Typography,
     Chip,
     Paper,
-    Box
+    Box,
+    LinearProgress
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Project, TimeLog } from '@/backend/firestore';
+import { Project, TimeLog, Task } from '@/backend/firestore';
 
 interface ProjectListProps {
     projects: Project[];
-    logs?: TimeLog[]; // Make optional for backward compatibility if needed, but we'll pass it
+    logs?: TimeLog[];
+    tasks?: Task[];
     onDelete: (id: string) => void;
     onEdit?: (project: Project) => void;
 }
 
-export default function ProjectList({ projects, logs = [], onDelete, onEdit }: ProjectListProps) {
+export default function ProjectList({ projects, logs = [], tasks = [], onDelete, onEdit }: ProjectListProps) {
     if (projects.length === 0) {
         return (
             <Typography variant="body1" color="text.secondary" align="center" sx={{ mt: 4 }}>
@@ -39,6 +41,11 @@ export default function ProjectList({ projects, logs = [], onDelete, onEdit }: P
                 const totalHours = projectLogs.reduce((acc, log) => acc + (log.duration / 3600), 0);
                 const totalEarnings = totalHours * (project.hourlyRate || 0);
 
+                // Calculate Progress
+                const projectTasks = tasks.filter(t => t.projectId === project.id);
+                const completedTasks = projectTasks.filter(t => t.status === 'done').length;
+                const progress = projectTasks.length > 0 ? (completedTasks / projectTasks.length) * 100 : 0;
+
                 return (
                     <Paper key={project.id} elevation={1} sx={{ mb: 2 }}>
                         <ListItem
@@ -54,54 +61,62 @@ export default function ProjectList({ projects, logs = [], onDelete, onEdit }: P
                                     </IconButton>
                                 </Box>
                             }
-                            disablePadding // Important when using ListItemButton inside
+                            disablePadding
                         >
                             <ListItemButton
                                 component="a"
                                 onClick={() => window.location.href = `/projects/${project.id}`}
-                                sx={{ textAlign: 'right' }}
+                                sx={{ textAlign: 'right', flexDirection: 'column', alignItems: 'stretch' }} // Changed layout
                             >
-                                <Box sx={{
-                                    width: 12,
-                                    height: 12,
-                                    borderRadius: '50%',
-                                    bgcolor: project.color,
-                                    ml: 2,
-                                    flexShrink: 0
-                                }} />
-                                <ListItemText
-                                    primary={
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                                            <Typography variant="h6">{project.name}</Typography>
-                                            <Chip
-                                                label={project.status === 'active' ? 'פעיל' : project.status === 'completed' ? 'הושלם' : 'בארכיון'}
-                                                size="small"
-                                                color={project.status === 'active' ? 'success' : project.status === 'completed' ? 'default' : 'warning'}
-                                                variant="outlined"
-                                            />
-                                        </Box>
-                                    }
-                                    secondary={
-                                        <Box sx={{ mt: 1 }}>
-                                            <Typography component="div" variant="body2" color="text.primary">
-                                                {project.client} {project.hourlyRate ? `— ₪${project.hourlyRate}/שעה` : ''}
-                                            </Typography>
+                                <Box display="flex" width="100%" alignItems="center" justifyContent="flex-end">
+                                    <Box sx={{
+                                        width: 12,
+                                        height: 12,
+                                        borderRadius: '50%',
+                                        bgcolor: project.color,
+                                        ml: 2,
+                                        flexShrink: 0
+                                    }} />
+                                    <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                                        <Typography variant="h6">{project.name}</Typography>
+                                        <Chip
+                                            label={project.status === 'active' ? 'פעיל' : project.status === 'completed' ? 'הושלם' : 'בארכיון'}
+                                            size="small"
+                                            color={project.status === 'active' ? 'success' : project.status === 'completed' ? 'default' : 'warning'}
+                                            variant="outlined"
+                                        />
+                                    </Box>
+                                </Box>
 
-                                            {totalHours > 0 && (
-                                                <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
-                                                    <Typography variant="body2" color="primary" fontWeight="bold">
-                                                        סה״כ: {totalHours.toFixed(1)} שעות
-                                                    </Typography>
-                                                    <Typography variant="body2" color="success.main" fontWeight="bold">
-                                                        רווח: ₪{totalEarnings.toFixed(2)}
-                                                    </Typography>
-                                                </Box>
-                                            )}
+                                <Box sx={{ mt: 1, pr: 3.5, width: '100%' }}>
+                                    <Typography component="div" variant="body2" color="text.primary">
+                                        {project.client} {project.hourlyRate ? `— ₪${project.hourlyRate}/שעה` : ''}
+                                    </Typography>
+
+                                    {totalHours > 0 && (
+                                        <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
+                                            <Typography variant="body2" color="primary" fontWeight="bold">
+                                                סה״כ: {totalHours.toFixed(1)} שעות
+                                            </Typography>
+                                            <Typography variant="body2" color="success.main" fontWeight="bold">
+                                                רווח: ₪{totalEarnings.toFixed(2)}
+                                            </Typography>
                                         </Box>
-                                    }
-                                    sx={{ textAlign: 'right', pr: 2 }} // Added right padding
-                                    secondaryTypographyProps={{ component: 'div' }}
-                                />
+                                    )}
+
+                                    {projectTasks.length > 0 && (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1.5 }}>
+                                            <LinearProgress
+                                                variant="determinate"
+                                                value={progress}
+                                                sx={{ flexGrow: 1, height: 6, borderRadius: 3 }}
+                                            />
+                                            <Typography variant="caption" color="text.secondary">
+                                                {Math.round(progress)}%
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                </Box>
                             </ListItemButton>
                         </ListItem>
                     </Paper>

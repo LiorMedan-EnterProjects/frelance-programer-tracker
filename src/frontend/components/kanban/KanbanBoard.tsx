@@ -21,6 +21,8 @@ import KanbanColumn from "./KanbanColumn";
 import KanbanCard from "./KanbanCard";
 import { createPortal } from "react-dom";
 
+import TaskModal from "../tasks/TaskModal";
+
 interface KanbanBoardProps {
     tasks: Task[];
     userId: string;
@@ -28,7 +30,13 @@ interface KanbanBoardProps {
     onTasksChange: (tasks: Task[]) => void;
     onEditTask?: (task: Task) => void;
     onDeleteTask?: (taskId: string) => void;
-    onAddTask?: (status: 'todo' | 'in-progress' | 'done', name: string) => Promise<void>;
+    onAddTask?: (
+        status: 'todo' | 'in-progress' | 'done',
+        name: string,
+        description?: string,
+        priority?: 'high' | 'medium' | 'low',
+        dueDate?: number | null
+    ) => Promise<void>;
 }
 
 export default function KanbanBoard({ tasks, userId, projectId, onTasksChange, onEditTask, onDeleteTask, onAddTask }: KanbanBoardProps) {
@@ -125,6 +133,47 @@ export default function KanbanBoard({ tasks, userId, projectId, onTasksChange, o
 
     const getTasksByStatus = (status: string) => tasks.filter(t => t.status === status);
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [taskToEdit, setTaskToEdit] = useState<Task | undefined>(undefined);
+    const [modalDefaultStatus, setModalDefaultStatus] = useState<'todo' | 'in-progress' | 'done'>('todo');
+
+    const handleAddTaskClick = (status: 'todo' | 'in-progress' | 'done') => {
+        setTaskToEdit(undefined);
+        setModalDefaultStatus(status);
+        setIsModalOpen(true);
+    };
+
+    const handleEditTaskClick = (task: Task) => {
+        setTaskToEdit(task);
+        setIsModalOpen(true);
+    };
+
+    const handleModalSave = async (taskData: Partial<Task>) => {
+        if (taskToEdit) {
+            // Edit existing
+            if (onEditTask) {
+                // In a real app we might want a dedicated updateTask prop that accepts partials,
+                // but for now we can merge locally or let valid onEditTask handle it.
+                // Actually, onEditTask signature in Props implies updating the full object or similar.
+                // Let's assume onEditTask expects a Task object.
+                const updatedTask = { ...taskToEdit, ...taskData };
+                onEditTask(updatedTask);
+            }
+        } else if (onAddTask) {
+            // Create new
+            // onAddTask currently only takes status and name. We need to support more fields.
+            // We'll updated the prop signature below or just pass what we can for now, 
+            // but ideally we should update the interface.
+            // Let's rely on the parent updating or just calling the API directly if we had the callback.
+            // Since onAddTask is limited signature, we might need to refactor KanbanBoardProps
+            // or we force the parent to accept an object.
+            // For this step, I'll update the prop signature in the same file to be flexible.
+            await onAddTask(modalDefaultStatus, taskData.name!, taskData.description, taskData.priority, taskData.dueDate);
+        }
+    };
+
+    // ... existing DND logic ...
+
     return (
         <DndContext
             sensors={sensors}
@@ -141,9 +190,8 @@ export default function KanbanBoard({ tasks, userId, projectId, onTasksChange, o
                         title={col.title}
                         tasks={getTasksByStatus(col.id)}
                         color={col.color}
-                        onEditTask={onEditTask}
-                        onAddTask={onAddTask}
-                    // onDeleteTask={onDeleteTask} // TODO: Add to KanbanColumn
+                        onEditTask={handleEditTaskClick}
+                        onAddTask={() => handleAddTaskClick(col.id)}
                     />
                 ))}
             </Stack>
@@ -156,6 +204,14 @@ export default function KanbanBoard({ tasks, userId, projectId, onTasksChange, o
                 </DragOverlay>,
                 document.body
             )}
+
+            <TaskModal
+                open={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSave={handleModalSave}
+                task={taskToEdit}
+                defaultProjectId={projectId}
+            />
         </DndContext>
     );
 }

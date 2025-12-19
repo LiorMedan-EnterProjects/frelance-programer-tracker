@@ -39,8 +39,11 @@ export interface Task {
   projectId: string;
   userId: string;
   name: string;
+  description?: string;
   isCompleted: boolean; // Keep for backward compatibility (mapped from status)
-  status: 'todo' | 'in-progress' | 'done'; // New field
+  status: 'todo' | 'in-progress' | 'done';
+  priority: 'high' | 'medium' | 'low';
+  dueDate?: number | null;
   createdAt: number;
   subTasks: SubTask[];
 }
@@ -151,7 +154,7 @@ export const getTimeLogs = async (userId: string) => {
 };
 
 // Tasks API
-export const addTask = async (userId: string, projectId: string, name: string) => {
+export const addTask = async (userId: string, projectId: string, name: string, description: string = '', priority: 'high' | 'medium' | 'low' = 'medium', dueDate: number | null = null) => {
   try {
     const taskRef = doc(collection(db, `users/${userId}/projects/${projectId}/tasks`));
     const task: Task = {
@@ -159,8 +162,11 @@ export const addTask = async (userId: string, projectId: string, name: string) =
       projectId,
       userId,
       name,
+      description,
       isCompleted: false,
       status: 'todo', // Default status
+      priority,
+      dueDate,
       createdAt: Date.now(),
       subTasks: []
     };

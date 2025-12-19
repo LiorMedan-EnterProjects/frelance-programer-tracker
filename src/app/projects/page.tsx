@@ -1,21 +1,24 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { Container, Typography, Box, Button, Dialog, DialogTitle, DialogContent, Snackbar, Alert } from '@mui/material';
+import { Container, Typography, Box, Button, Snackbar, Alert } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useAuth } from '@/frontend/context/AuthContext';
 import { useData } from '@/frontend/context/DataContext';
-import { deleteProject, Project } from '@/backend/firestore';
+import { deleteProject, updateProject, Project } from '@/backend/firestore';
 import ProjectList from '@/frontend/components/projects/ProjectList';
-import ProjectForm from '@/frontend/components/projects/ProjectForm';
+import ProjectModal from '@/frontend/components/projects/ProjectModal';
 import { useRouter } from 'next/navigation';
 
 export default function ProjectsPage() {
     const { user } = useAuth();
-    const { projects, logs, createNewProject, refreshData } = useData();
+    const { projects, logs, tasks, createNewProject, refreshData } = useData();
     const router = useRouter();
-    // const [projects, setProjects] = useState<Project[]>([]); // Removed local state
-    const [open, setOpen] = useState(false);
+
+    // Modal State
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [projectToEdit, setProjectToEdit] = useState<Project | undefined>(undefined);
+
     const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
         open: false,
         message: '',
@@ -28,17 +31,36 @@ export default function ProjectsPage() {
         }
     }, [user, router]);
 
-    const handleCreateProject = async (projectData: Omit<Project, 'id' | 'createdAt' | 'userId'>) => {
+    const handleCreateClick = () => {
+        setProjectToEdit(undefined);
+        setIsModalOpen(true);
+    };
+
+    const handleEditClick = (project: Project) => {
+        setProjectToEdit(project);
+        setIsModalOpen(true);
+    };
+
+    const handleSaveProject = async (projectData: Partial<Project>) => {
         if (!user) return;
 
         // Optimistic UI: Close dialog immediately
-        setOpen(false);
+        setIsModalOpen(false);
         setSnackbar({ open: true, message: 'הפרויקט נשמר!', severity: 'success' });
 
         try {
-            await createNewProject(projectData);
+            if (projectToEdit && projectToEdit.id) {
+                // Update existing
+                await updateProject(projectToEdit.id, projectData);
+            } else {
+                // Create new
+                // We need to cast to casting type expected by createNewProject
+                // or just call createNewProject which takes Omit<Project, ...>
+                await createNewProject(projectData as any);
+            }
+            await refreshData();
         } catch (error) {
-            console.error("Error creating project:", error);
+            console.error("Error saving project:", error);
             setSnackbar({ open: true, message: 'שגיאה בשמירה. הנתונים לא נשמרו.', severity: 'error' });
         }
     };
@@ -70,22 +92,26 @@ export default function ProjectsPage() {
                 <Button
                     variant="contained"
                     startIcon={<AddIcon />}
-                    onClick={() => setOpen(true)}
+                    onClick={handleCreateClick}
                 >
                     פרויקט חדש
                 </Button>
             </Box>
 
-            <ProjectList projects={projects} logs={logs} onDelete={handleDeleteProject} />
+            <ProjectList
+                projects={projects}
+                logs={logs}
+                tasks={tasks}
+                onDelete={handleDeleteProject}
+                onEdit={handleEditClick}
+            />
 
-            <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
-                <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold' }}>יצירת פרויקט חדש</DialogTitle>
-                <DialogContent>
-                    <Box sx={{ pt: 1 }}>
-                        <ProjectForm onSubmit={handleCreateProject} />
-                    </Box>
-                </DialogContent>
-            </Dialog>
+            <ProjectModal
+                open={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSave={handleSaveProject}
+                project={projectToEdit}
+            />
 
             <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
                 <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
