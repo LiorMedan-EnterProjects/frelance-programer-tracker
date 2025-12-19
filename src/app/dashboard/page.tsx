@@ -10,18 +10,12 @@ import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import TextField from "@mui/material/TextField";
 import AddIcon from '@mui/icons-material/Add';
 
 import { useAuth } from "@/frontend/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { sendEmailVerification } from "firebase/auth";
 import { useData } from "@/frontend/context/DataContext";
-import { addProject } from "@/backend/firestore"; // Import addProject
 
 import DashboardStats from "@/frontend/components/dashboard/DashboardStats";
 import TimeLogList from "@/frontend/components/timer/TimeLogList";
@@ -30,18 +24,16 @@ import ProjectList from "@/frontend/components/projects/ProjectList";
 import HoursByProjectChart from "@/frontend/components/dashboard/HoursByProjectChart";
 import WeeklyActivityChart from "@/frontend/components/dashboard/WeeklyActivityChart";
 import StatusBarChart from "@/frontend/components/dashboard/StatusBarChart";
-import { prepareProjectData, prepareWeeklyActivity, prepareTaskStatusData, prepareProjectStatusData } from "@/frontend/utils/chartUtils";
+import ProjectModal from "@/frontend/components/projects/ProjectModal";
+import { prepareTaskStatusData, prepareProjectStatusData } from "@/frontend/utils/chartUtils";
 
 export default function DashboardPage() {
     const { user, loading } = useAuth();
-    const { projects, logs, tasks } = useData(); // Added tasks
+    const { projects, logs, tasks, createNewProject } = useData();
     const router = useRouter();
 
-    // Dialog State
-    const [openProjectDialog, setOpenProjectDialog] = useState(false);
-    const [newProjectName, setNewProjectName] = useState("");
-    const [newProjectRate, setNewProjectRate] = useState("");
-    const [newProjectClient, setNewProjectClient] = useState("");
+    // Modal State
+    const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
     // Filter out logs that belong to deleted projects
     const activeLogs = useMemo(() => {
@@ -80,34 +72,13 @@ export default function DashboardPage() {
     }
 
     const handleLogAdded = () => {
-        // Trigger data refresh if needed, but DataContext should handle real-time updates
-        // If DataContext is not real-time, we might need a force refresh.
-        // Assuming DataContext is real-time for now.
+        // DataContext handles real-time updates
     };
 
-    const handleDeleteProject = async (id: string) => {
-        if (confirm('האם למחוק את הפרויקט?')) {
-            // await deleteProject(id); // Need to import deleteProject
-            // For now, let's strictly follow existing imports or add it.
-            // Im implementing the layout first.
-        }
-    };
-
-    const handleCreateProject = async () => {
-        if (!user || !newProjectName.trim()) return;
+    const handleCreateProject = async (projectData: any) => {
         try {
-            await addProject({
-                userId: user.uid,
-                name: newProjectName,
-                client: newProjectClient,
-                hourlyRate: Number(newProjectRate),
-                color: '#' + Math.floor(Math.random() * 16777215).toString(16),
-                status: 'active'
-            });
-            setOpenProjectDialog(false);
-            setNewProjectName("");
-            setNewProjectRate("");
-            setNewProjectClient("");
+            await createNewProject(projectData);
+            setIsProjectModalOpen(false);
         } catch (error) {
             console.error("Error creating project:", error);
         }
@@ -122,6 +93,20 @@ export default function DashboardPage() {
                         {verificationSent ? "מייל נשלח" : "נא לאמת מייל"}
                     </Alert>
                 )}
+
+                {/* Dashboard Header */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                    <Typography variant="h4" component="h1" fontWeight="bold">
+                        לוח בקרה
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        onClick={() => setIsProjectModalOpen(true)}
+                    >
+                        פרויקט חדש
+                    </Button>
+                </Box>
 
                 {/* 1. Timer (Top Priority) */}
                 <Box sx={{ mb: 3 }}>
@@ -167,7 +152,7 @@ export default function DashboardPage() {
                                     <Button
                                         size="small"
                                         startIcon={<AddIcon />}
-                                        onClick={() => setOpenProjectDialog(true)}
+                                        onClick={() => setIsProjectModalOpen(true)}
                                         sx={{ mr: 1 }}
                                     >
                                         חדש
@@ -198,45 +183,12 @@ export default function DashboardPage() {
                     </Grid>
                 </Grid>
 
-                {/* Add Project Dialog */}
-                <Dialog open={openProjectDialog} onClose={() => setOpenProjectDialog(false)} maxWidth="sm" fullWidth dir="rtl">
-                    <DialogTitle>פרויקט חדש</DialogTitle>
-                    <DialogContent dividers>
-                        <Grid container spacing={2} sx={{ mt: 1 }}>
-                            <Grid size={{ xs: 12 }}>
-                                <TextField
-                                    fullWidth
-                                    label="שם הפרויקט"
-                                    value={newProjectName}
-                                    onChange={(e) => setNewProjectName(e.target.value)}
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <TextField
-                                    fullWidth
-                                    label="שם הלקוח"
-                                    value={newProjectClient}
-                                    onChange={(e) => setNewProjectClient(e.target.value)}
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <TextField
-                                    fullWidth
-                                    type="number"
-                                    label="תעריף לשעה (₪)"
-                                    value={newProjectRate}
-                                    onChange={(e) => setNewProjectRate(e.target.value)}
-                                />
-                            </Grid>
-                        </Grid>
-                    </DialogContent>
-                    <DialogActions sx={{ p: 2 }}>
-                        <Button onClick={() => setOpenProjectDialog(false)}>ביטול</Button>
-                        <Button variant="contained" onClick={handleCreateProject} disabled={!newProjectName.trim()}>
-                            צור פרויקט
-                        </Button>
-                    </DialogActions>
-                </Dialog>
+                {/* Global Project Modal */}
+                <ProjectModal
+                    open={isProjectModalOpen}
+                    onClose={() => setIsProjectModalOpen(false)}
+                    onSave={handleCreateProject}
+                />
             </Box>
         </Container>
     );
