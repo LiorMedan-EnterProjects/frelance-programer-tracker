@@ -75,7 +75,7 @@ export default function ProjectModal({ open, onClose, onSave, project }: Project
             PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
         >
             <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h6" fontWeight="bold">
+                <Typography variant="h6" component="div" fontWeight="bold">
                     {project ? 'ערוך פרויקט' : 'פרויקט חדש'}
                 </Typography>
                 <IconButton onClick={onClose} size="small">
