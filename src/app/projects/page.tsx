@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import { Container, Typography, Box, Button, Dialog, DialogTitle, DialogContent, Snackbar, Alert } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { useAuth } from '@/context/AuthContext';
-import { useData } from '@/context/DataContext';
-import { deleteProject, Project } from '@/lib/firestore';
-import ProjectList from '@/components/projects/ProjectList';
-import ProjectForm from '@/components/projects/ProjectForm';
+import { useAuth } from '@/frontend/context/AuthContext';
+import { useData } from '@/frontend/context/DataContext';
+import { deleteProject, Project } from '@/backend/firestore';
+import ProjectList from '@/frontend/components/projects/ProjectList';
+import ProjectForm from '@/frontend/components/projects/ProjectForm';
 import { useRouter } from 'next/navigation';
 
 export default function ProjectsPage() {

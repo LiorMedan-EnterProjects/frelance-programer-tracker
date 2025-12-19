@@ -3,7 +3,7 @@
 import React from 'react';
 import { Paper, Typography, Box, useTheme } from '@mui/material';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { ProjectChartData } from '@/lib/chartUtils';
+import { ProjectChartData } from '@/frontend/utils/chartUtils';
 
 interface Props {
     data: ProjectChartData[];

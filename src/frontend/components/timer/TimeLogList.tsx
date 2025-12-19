@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import HistoryToggleOffRoundedIcon from '@mui/icons-material/HistoryToggleOffRounded';
 import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
-import { TimeLog, Project } from '@/lib/firestore';
+import { TimeLog, Project } from '@/backend/firestore';
 
 interface TimeLogListProps {
     logs: TimeLog[];

@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useData } from '../context/DataContext';
+import { useAuth } from '@/frontend/context/AuthContext';
+import { useData } from '@/frontend/context/DataContext';
 import { useRouter } from 'next/navigation';
 import {
     Container,
     Typography,
+    // ... (skip intermediate lines if possible, but replace requires contiguous block usually, or multi_replace. Here I'll use exact replace for imports)
+    // Wait, I can't skip lines in replace_file_content easily without providing all context.
+    // I'll grab the top block.
     Box,
     Paper,
     FormControl,
@@ -41,7 +44,7 @@ import {
     Task,
     SubTask,
     updateSubTask
-} from '@/lib/firestore';
+} from '@/backend/firestore';
 
 export default function TasksPage() {
     const { user, loading } = useAuth();
@@ -129,7 +132,7 @@ export default function TasksPage() {
 
     const toggleTaskStatus = async (task: Task) => {
         if (!user || !selectedProjectId || !task.id) return;
-        const newStatus = task.status === 'active' ? 'completed' : 'active';
+        const newStatus = task.status === 'done' ? 'todo' : 'done';
         try {
             await updateTaskStatus(user.uid, selectedProjectId, task.id, newStatus);
             setTasks(tasks.map(t => t.id === task.id ? { ...t, status: newStatus } : t));
@@ -195,7 +198,7 @@ export default function TasksPage() {
                                 <Box key={task.id} sx={{ '&:not(:last-child)': { borderBottom: `1px solid ${theme.palette.divider}` } }}>
                                     <ListItem
                                         sx={{
-                                            opacity: task.status === 'completed' ? 0.6 : 1,
+                                            opacity: task.status === 'done' ? 0.6 : 1,
                                             flexWrap: 'wrap'
                                         }}
                                     >
@@ -204,13 +207,13 @@ export default function TasksPage() {
                                                 <Stack direction="row" alignItems="center" spacing={1}>
                                                     <Checkbox
                                                         edge="start"
-                                                        checked={task.status === 'completed'}
+                                                        checked={task.status === 'done'}
                                                         onChange={() => toggleTaskStatus(task)}
                                                     />
                                                     <Typography
                                                         variant="h6"
                                                         sx={{
-                                                            textDecoration: task.status === 'completed' ? 'line-through' : 'none',
+                                                            textDecoration: task.status === 'done' ? 'line-through' : 'none',
                                                             fontSize: '1.1rem'
                                                         }}
                                                     >

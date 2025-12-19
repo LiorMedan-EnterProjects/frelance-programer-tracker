@@ -4,7 +4,7 @@ import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { Box, Typography, Paper, useTheme, alpha, Chip, Button, TextField } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
-import { Task } from "@/lib/firestore";
+import { Task } from "@/backend/firestore";
 import KanbanCard from "./KanbanCard";
 import { useState } from "react";
 

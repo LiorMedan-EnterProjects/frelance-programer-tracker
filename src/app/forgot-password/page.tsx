@@ -10,7 +10,7 @@ import LockResetIcon from "@mui/icons-material/LockReset";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { sendPasswordResetEmail } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth } from "@/backend/firebase";
 import { useRouter } from "next/navigation";
 import Grid from "@mui/material/Grid";
 

@@ -5,7 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Paper, Typography, Box, Chip, IconButton } from "@mui/material";
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import EditIcon from '@mui/icons-material/Edit';
-import { Task } from "@/lib/firestore";
+import { Task } from "@/backend/firestore";
 
 interface KanbanCardProps {
     task: Task;
@@ -69,10 +69,10 @@ export default function KanbanCard({ task, onEdit }: KanbanCardProps) {
             {task.subTasks && task.subTasks.length > 0 && (
                 <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
                     <Chip
-                        label={`${task.subTasks.filter(st => st.isCompleted).length}/${task.subTasks.length}`}
+                        label={`${task.subTasks.filter(st => st.status === 'completed').length}/${task.subTasks.length}`}
                         size="small"
                         variant="outlined"
-                        color={task.subTasks.every(st => st.isCompleted) ? 'success' : 'default'}
+                        color={task.subTasks.every(st => st.status === 'completed') ? 'success' : 'default'}
                         sx={{ height: 20, fontSize: '0.7rem' }}
                     />
                 </Box>

@@ -25,7 +25,7 @@ import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 import StopRoundedIcon from '@mui/icons-material/StopRounded';
 import EditCalendarRoundedIcon from '@mui/icons-material/EditCalendarRounded';
 import CloseIcon from '@mui/icons-material/Close';
-import { Project, addTimeLog, getProjectTasks, Task } from '@/lib/firestore';
+import { Project, addTimeLog, getProjectTasks, Task } from '@/backend/firestore';
 import { Timestamp } from 'firebase/firestore';
 import { keyframes } from '@emotion/react';
 

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
-import { Project, TimeLog, Task, getProjects, getTimeLogs, addProject, addTimeLog, getAllUserTasks } from '@/lib/firestore';
+import { Project, TimeLog, Task, getProjects, getTimeLogs, addProject, addTimeLog, getAllUserTasks } from '@/backend/firestore';
 
 interface DataContextType {
     projects: Project[];

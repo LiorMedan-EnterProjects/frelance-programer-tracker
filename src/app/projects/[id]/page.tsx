@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { useData } from '@/context/DataContext';
+import { useAuth } from '@/frontend/context/AuthContext';
+import { useData } from '@/frontend/context/DataContext';
 import { useRouter, useParams } from 'next/navigation';
 import {
     Container,
@@ -20,9 +20,9 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import ViewKanbanIcon from '@mui/icons-material/ViewKanban';
 
-import TaskList from '@/components/tasks/TaskList';
-import KanbanBoard from '@/components/kanban/KanbanBoard';
-import { getProjectTasks, Task, addTask, deleteTask } from '@/lib/firestore';
+import TaskList from '@/frontend/components/tasks/TaskList';
+import KanbanBoard from '@/frontend/components/kanban/KanbanBoard';
+import { getProjectTasks, Task, addTask, deleteTask } from '@/backend/firestore';
 
 export default function ProjectDetailsPage() {
     const { user, loading } = useAuth();

@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { Container, Typography, Box } from '@mui/material';
-import { useAuth } from '@/context/AuthContext';
-import { getProjects, getTimeLogs, Project, TimeLog } from '@/lib/firestore';
-import Timer from '@/components/timer/Timer';
+import { useAuth } from '@/frontend/context/AuthContext';
+import { getProjects, getTimeLogs, Project, TimeLog } from '@/backend/firestore';
+import Timer from '@/frontend/components/timer/Timer';
 
 import { useRouter } from 'next/navigation';
 

@@ -11,7 +11,7 @@ import {
     InputLabel,
     Stack
 } from '@mui/material';
-import { Project } from '@/lib/firestore';
+import { Project } from '@/backend/firestore';
 
 interface ProjectFormProps {
     onSubmit: (project: Omit<Project, 'id' | 'createdAt' | 'userId'>) => Promise<void>;

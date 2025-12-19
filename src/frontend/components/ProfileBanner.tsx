@@ -6,7 +6,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/frontend/context/AuthContext";
 
 export default function ProfileBanner() {
     const { user } = useAuth();

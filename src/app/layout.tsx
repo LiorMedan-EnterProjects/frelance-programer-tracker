@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
-import ThemeRegistry from "@/components/ThemeRegistry/ThemeRegistry";
-import { AuthProvider } from "@/context/AuthContext";
-import { ColorModeProvider } from "@/context/ThemeContext";
-import { DataProvider } from "@/context/DataContext";
-import AppShell from "@/components/AppShell";
+import ThemeRegistry from "@/frontend/components/ThemeRegistry/ThemeRegistry";
+import { AuthProvider } from "@/frontend/context/AuthContext";
+import { ColorModeProvider } from "@/frontend/context/ThemeContext";
+import { DataProvider } from "@/frontend/context/DataContext";
+import AppShell from "@/frontend/components/AppShell";
 
 const heebo = Heebo({ subsets: ["hebrew", "latin"] });
 

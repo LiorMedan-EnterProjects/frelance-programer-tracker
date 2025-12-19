@@ -10,11 +10,11 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/frontend/context/AuthContext";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
-import Footer from "@/components/Footer";
+import Footer from "@/frontend/components/Footer";
 
 export default function HomePage() {
   const router = useRouter();

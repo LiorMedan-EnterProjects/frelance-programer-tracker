@@ -4,7 +4,7 @@ import { Grid, Paper, Typography, Box } from '@mui/material';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import { Project, TimeLog } from '@/lib/firestore';
+import { Project, TimeLog } from '@/backend/firestore';
 
 interface DashboardStatsProps {
     projects: Project[];

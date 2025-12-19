@@ -2,10 +2,10 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import getDesignTokens from "@/frontend/components/ThemeRegistry/theme";
 import CssBaseline from "@mui/material/CssBaseline";
-import getDesignTokens from "@/components/ThemeRegistry/theme";
-import { UserProfile } from "@/lib/firestore";
-import { useAuth } from "@/context/AuthContext";
+import { UserProfile } from "@/backend/firestore";
+import { useAuth } from "./AuthContext";
 
 interface ThemeContextType {
     mode: 'light' | 'dark';

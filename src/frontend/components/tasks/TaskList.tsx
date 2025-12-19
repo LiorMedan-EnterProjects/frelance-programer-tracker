@@ -33,8 +33,8 @@ import {
     Task,
     SubTask,
     updateSubTask
-} from '@/lib/firestore'; // Check relative path if moved
-import { useAuth } from '@/context/AuthContext';
+} from '@/backend/firestore';
+import { useAuth } from '@/frontend/context/AuthContext';
 
 interface TaskListProps {
     tasks: Task[];
@@ -164,7 +164,7 @@ export default function TaskList({ tasks, projectId, onAddTask, onDeleteTask, on
                         <Box key={task.id} sx={{ '&:not(:last-child)': { borderBottom: `1px solid ${theme.palette.divider}` } }}>
                             <ListItem
                                 sx={{
-                                    opacity: task.status === 'completed' ? 0.6 : 1,
+                                    opacity: task.status === 'done' ? 0.6 : 1,
                                     flexWrap: 'wrap',
                                     direction: 'rtl' // Ensure RTL
                                 }}
@@ -174,13 +174,13 @@ export default function TaskList({ tasks, projectId, onAddTask, onDeleteTask, on
                                         <Stack direction="row" alignItems="center" spacing={1}>
                                             <Checkbox
                                                 edge="start"
-                                                checked={task.status === 'completed'}
+                                                checked={task.status === 'done'}
                                                 onChange={() => toggleTaskStatus(task)}
                                             />
                                             <Typography
                                                 variant="h6"
                                                 sx={{
-                                                    textDecoration: task.status === 'completed' ? 'line-through' : 'none',
+                                                    textDecoration: task.status === 'done' ? 'line-through' : 'none',
                                                     fontSize: '1.1rem',
                                                     textAlign: 'right' // Force Right Align
                                                 }}

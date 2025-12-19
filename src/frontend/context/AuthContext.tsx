@@ -9,8 +9,8 @@ import {
     GoogleAuthProvider,
     GithubAuthProvider
 } from "firebase/auth";
-import { auth, googleProvider, githubProvider } from "@/lib/firebase";
-import { createUserProfile } from "@/lib/firestore";
+import { auth, googleProvider, githubProvider } from "@/backend/firebase";
+import { createUserProfile } from "@/backend/firestore";
 
 interface AuthContextType {
     user: User | null;

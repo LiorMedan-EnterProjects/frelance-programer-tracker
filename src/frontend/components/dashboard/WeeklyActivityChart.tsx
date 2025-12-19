@@ -3,7 +3,7 @@
 import React from 'react';
 import { Paper, Typography, useTheme, Box } from '@mui/material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { WeeklyChartData } from '@/lib/chartUtils';
+import { WeeklyChartData } from '@/frontend/utils/chartUtils';
 
 interface Props {
     data: WeeklyChartData[];

@@ -1,4 +1,4 @@
-import { Project, TimeLog } from "./firestore";
+import { Project, TimeLog } from "@/backend/firestore";
 
 export interface ProjectChartData {
     name: string;

@@ -1,7 +1,7 @@
 "use client";
 
 import Box from '@mui/material/Box';
-import Navbar from '@/components/Navbar';
+import Navbar from '@/frontend/components/Navbar';
 import { ReactNode } from 'react';
 
 export default function AppShell({ children }: { children: ReactNode }) {

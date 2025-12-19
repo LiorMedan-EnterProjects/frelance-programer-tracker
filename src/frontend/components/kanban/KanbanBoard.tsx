@@ -16,7 +16,7 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { Box, Stack, useTheme } from "@mui/material";
-import { Task, updateTaskStatus } from "@/lib/firestore";
+import { Task, updateTaskStatus } from "@/backend/firestore";
 import KanbanColumn from "./KanbanColumn";
 import KanbanCard from "./KanbanCard";
 import { createPortal } from "react-dom";

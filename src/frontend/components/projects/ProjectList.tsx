@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Project, TimeLog } from '@/lib/firestore';
+import { Project, TimeLog } from '@/backend/firestore';
 
 interface ProjectListProps {
     projects: Project[];

@@ -17,20 +17,20 @@ import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField";
 import AddIcon from '@mui/icons-material/Add';
 
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/frontend/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { sendEmailVerification } from "firebase/auth";
-import { useData } from "@/context/DataContext";
-import { addProject } from "@/lib/firestore"; // Import addProject
+import { useData } from "@/frontend/context/DataContext";
+import { addProject } from "@/backend/firestore"; // Import addProject
 
-import DashboardStats from "@/components/dashboard/DashboardStats";
-import TimeLogList from "@/components/timer/TimeLogList";
-import Timer from "@/components/timer/Timer";
-import ProjectList from "@/components/projects/ProjectList";
-import HoursByProjectChart from "@/components/dashboard/HoursByProjectChart";
-import WeeklyActivityChart from "@/components/dashboard/WeeklyActivityChart";
-import StatusBarChart from "@/components/dashboard/StatusBarChart";
-import { prepareProjectData, prepareWeeklyActivity, prepareTaskStatusData, prepareProjectStatusData } from "@/lib/chartUtils";
+import DashboardStats from "@/frontend/components/dashboard/DashboardStats";
+import TimeLogList from "@/frontend/components/timer/TimeLogList";
+import Timer from "@/frontend/components/timer/Timer";
+import ProjectList from "@/frontend/components/projects/ProjectList";
+import HoursByProjectChart from "@/frontend/components/dashboard/HoursByProjectChart";
+import WeeklyActivityChart from "@/frontend/components/dashboard/WeeklyActivityChart";
+import StatusBarChart from "@/frontend/components/dashboard/StatusBarChart";
+import { prepareProjectData, prepareWeeklyActivity, prepareTaskStatusData, prepareProjectStatusData } from "@/frontend/utils/chartUtils";
 
 export default function DashboardPage() {
     const { user, loading } = useAuth();

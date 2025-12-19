@@ -18,7 +18,7 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import LoginIcon from "@mui/icons-material/Login";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/frontend/context/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
 import ThemeToggle from "./ThemeToggle";
 import { useTheme } from "@mui/material/styles";
