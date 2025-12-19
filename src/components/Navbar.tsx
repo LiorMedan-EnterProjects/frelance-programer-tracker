@@ -141,12 +141,24 @@ export default function Navbar() {
                                 open={Boolean(anchorEl)}
                                 onClose={handleClose}
                             >
-                                <MenuItem disabled>
-                                    <Typography variant="body2" fontWeight="bold">
+                                <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 200, outline: 'none' }}>
+                                    <Avatar
+                                        src={user.photoURL || undefined}
+                                        sx={{ width: 64, height: 64, mb: 1, bgcolor: 'primary.main' }}
+                                    >
+                                        {user.displayName?.charAt(0) || <AccountCircleIcon fontSize="large" />}
+                                    </Avatar>
+                                    <Typography variant="subtitle1" fontWeight="bold">
                                         {user.displayName || 'משתמש'}
                                     </Typography>
-                                </MenuItem>
-                                <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+                                    <Typography variant="body2" color="text.secondary" gutterBottom>
+                                        {user.email}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.7rem' }}>
+                                        UID: {user.uid.substring(0, 8)}...
+                                    </Typography>
+                                </Box>
+                                <MenuItem onClick={handleLogout} sx={{ color: 'error.main', justifyContent: 'center', borderTop: 1, borderColor: 'divider', pt: 1 }}>
                                     <LogoutIcon fontSize="small" sx={{ ml: 1 }} />
                                     התנתק
                                 </MenuItem>

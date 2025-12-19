@@ -22,7 +22,7 @@ export default function ProfileBanner() {
                 src={user.photoURL || undefined}
                 sx={{ width: 80, height: 80, ml: 3 }}
             />
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, textAlign: 'right' }}>
                 <CardContent sx={{ flex: '1 0 auto' }}>
                     <Typography component="div" variant="h5">
                         {user.displayName || "Anonymous User"}

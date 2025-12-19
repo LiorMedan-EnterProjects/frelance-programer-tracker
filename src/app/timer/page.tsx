@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { Container, Typography, Box, Grid } from '@mui/material';
+import { Container, Typography, Box } from '@mui/material';
 import { useAuth } from '@/context/AuthContext';
 import { getProjects, getTimeLogs, Project, TimeLog } from '@/lib/firestore';
 import Timer from '@/components/timer/Timer';
-import TimeLogList from '@/components/timer/TimeLogList';
+
 import { useRouter } from 'next/navigation';
 
 export default function TimerPage() {
@@ -39,25 +39,16 @@ export default function TimerPage() {
     if (!user) return null;
 
     return (
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-            <Typography variant="h4" component="h1" gutterBottom sx={{ textAlign: 'right' }}>
-                מעקב שעות
-            </Typography>
+        <Container maxWidth="md" sx={{ py: 4 }}>
 
-            <Grid container spacing={4}>
-                <Grid size={{ xs: 12, md: 6 }}>
-                    <Typography variant="h6" gutterBottom sx={{ textAlign: 'right' }}>שעון</Typography>
-                    <Timer
-                        projects={projects}
-                        userId={user.uid}
-                        onLogAdded={fetchData}
-                    />
-                </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                    <Typography variant="h6" gutterBottom sx={{ textAlign: 'right' }}>פעילות אחרונה</Typography>
-                    <TimeLogList logs={logs} projects={projects} />
-                </Grid>
-            </Grid>
+
+            <Box sx={{ mt: 4 }}>
+                <Timer
+                    projects={projects}
+                    userId={user.uid}
+                    onLogAdded={fetchData}
+                />
+            </Box>
         </Container>
     );
 }

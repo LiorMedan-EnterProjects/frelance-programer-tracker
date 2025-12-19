@@ -12,42 +12,35 @@ import {
     TextField,
     Paper,
     Stack,
-    Tabs,
-    Tab,
     useTheme,
-    alpha
+    alpha,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    IconButton,
+    Tooltip
 } from '@mui/material';
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 import StopRoundedIcon from '@mui/icons-material/StopRounded';
-import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
 import EditCalendarRoundedIcon from '@mui/icons-material/EditCalendarRounded';
-import { Project, addTimeLog } from '@/lib/firestore';
+import CloseIcon from '@mui/icons-material/Close';
+import { Project, addTimeLog, getProjectTasks, Task } from '@/lib/firestore';
 import { Timestamp } from 'firebase/firestore';
 import { keyframes } from '@emotion/react';
 
+// ... keyframes (pulse, pulseDark) ...
 const pulse = keyframes`
-  0% {
-    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
-  }
-  70% {
-    box-shadow: 0 0 0 15px rgba(37, 99, 235, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
-  }
+  0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+`;
+const pulseDark = keyframes`
+  0% { box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(96, 165, 250, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(96, 165, 250, 0); }
 `;
 
-const pulseDark = keyframes`
-  0% {
-    box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.4);
-  }
-  70% {
-    box-shadow: 0 0 0 15px rgba(96, 165, 250, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(96, 165, 250, 0);
-  }
-`;
 
 interface TimerProps {
     projects: Project[];
@@ -58,14 +51,16 @@ interface TimerProps {
 export default function Timer({ projects, userId, onLogAdded }: TimerProps) {
     const theme = useTheme();
     const [selectedProject, setSelectedProject] = useState('');
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [selectedTaskId, setSelectedTaskId] = useState('');
     const [description, setDescription] = useState('');
     const [isRunning, setIsRunning] = useState(false);
     const [elapsedTime, setElapsedTime] = useState(0);
     const [startTime, setStartTime] = useState<Date | null>(null);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
-    const [tabValue, setTabValue] = useState(0);
 
     // Manual Entry State
+    const [openManualDialog, setOpenManualDialog] = useState(false);
     const [manualDate, setManualDate] = useState(new Date().toISOString().split('T')[0]);
     const [manualStartTime, setManualStartTime] = useState('09:00');
     const [manualEndTime, setManualEndTime] = useState('10:00');
@@ -75,6 +70,20 @@ export default function Timer({ projects, userId, onLogAdded }: TimerProps) {
             if (intervalRef.current) clearInterval(intervalRef.current);
         };
     }, []);
+
+    // Fetch tasks when project changes
+    useEffect(() => {
+        const fetchTasks = async () => {
+            if (selectedProject) {
+                const projectTasks = await getProjectTasks(userId, selectedProject);
+                setTasks(projectTasks);
+                setSelectedTaskId('');
+            } else {
+                setTasks([]);
+            }
+        };
+        fetchTasks();
+    }, [selectedProject, userId]);
 
     const handleStart = () => {
         if (!selectedProject) {
@@ -97,9 +106,12 @@ export default function Timer({ projects, userId, onLogAdded }: TimerProps) {
         const duration = Math.floor((endTime.getTime() - startTime.getTime()) / 1000);
 
         try {
+            const task = tasks.find(t => t.id === selectedTaskId);
             await addTimeLog({
                 userId,
                 projectId: selectedProject,
+                taskId: selectedTaskId || undefined,
+                taskName: task ? task.name : undefined,
                 startTime: Timestamp.fromDate(startTime),
                 endTime: Timestamp.fromDate(endTime),
                 duration,
@@ -114,13 +126,8 @@ export default function Timer({ projects, userId, onLogAdded }: TimerProps) {
         }
     };
 
-    const handleManualSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!selectedProject) {
-            alert("נא לבחור פרויקט.");
-            return;
-        }
-
+    const handleManualSubmit = async () => {
+        if (!selectedProject) return; // Should be handled by validation in form
         const start = new Date(`${manualDate}T${manualStartTime}`);
         const end = new Date(`${manualDate}T${manualEndTime}`);
         const duration = Math.floor((end.getTime() - start.getTime()) / 1000);
@@ -131,9 +138,12 @@ export default function Timer({ projects, userId, onLogAdded }: TimerProps) {
         }
 
         try {
+            const task = tasks.find(t => t.id === selectedTaskId);
             await addTimeLog({
                 userId,
                 projectId: selectedProject,
+                taskId: selectedTaskId || undefined,
+                taskName: task ? task.name : undefined,
                 startTime: Timestamp.fromDate(start),
                 endTime: Timestamp.fromDate(end),
                 duration,
@@ -141,6 +151,8 @@ export default function Timer({ projects, userId, onLogAdded }: TimerProps) {
             });
             onLogAdded();
             setDescription('');
+            setOpenManualDialog(false);
+            alert("הדיווח נוסף בהצלחה!");
         } catch (error) {
             console.error("Error saving manual log:", error);
         }
@@ -155,184 +167,185 @@ export default function Timer({ projects, userId, onLogAdded }: TimerProps) {
 
     return (
         <Paper
-            elevation={0}
+            elevation={3}
             sx={{
-                p: 0,
+                p: 2,
                 borderRadius: 4,
-                overflow: 'hidden',
-                border: `1px solid ${theme.palette.mode === 'dark' ? theme.palette.divider : alpha(theme.palette.divider, 0.1)}`,
-                background: theme.palette.background.paper, // Solid background
-                boxShadow: theme.shadows[4]
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                flexWrap: 'wrap', // Allow wrapping on very small screens
+                position: 'relative', // For manual button positioning
             }}
         >
-            <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: alpha(theme.palette.primary.main, 0.05) }}>
-                <Tabs
-                    value={tabValue}
-                    onChange={(e, v) => setTabValue(v)}
-                    centered
-                    sx={{
-                        '& .MuiTab-root': { fontWeight: 600, minHeight: 64, fontSize: '1rem' }
-                    }}
-                >
-                    <Tab icon={<AccessTimeRoundedIcon />} iconPosition="start" label="שעון" />
-                    <Tab icon={<EditCalendarRoundedIcon />} iconPosition="start" label="הזנה ידנית" />
-                </Tabs>
+            {/* Timer Display - Compact */}
+            <Box sx={{
+                minWidth: 120,
+                textAlign: 'center',
+                fontFamily: 'monospace',
+                fontWeight: 'bold',
+                fontSize: '2rem',
+                lineHeight: 1,
+                color: isRunning ? 'primary.main' : 'text.primary'
+            }}>
+                {formatTime(elapsedTime)}
             </Box>
 
-            <Box sx={{ p: 4 }}>
-                <Stack spacing={3}>
-                    <FormControl fullWidth>
-                        <InputLabel>פרויקט</InputLabel>
-                        <Select
-                            value={selectedProject}
-                            label="פרויקט"
-                            onChange={(e) => setSelectedProject(e.target.value)}
-                            disabled={isRunning}
-                            sx={{ borderRadius: 2, textAlign: 'center' }}
-                            MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
-                        >
-                            {projects.map((p) => (
-                                <MenuItem key={p.id} value={p.id} sx={{ justifyContent: 'center' }}>{p.name}</MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
+            {/* Controls */}
+            <Stack direction="row" spacing={1} flexGrow={1} alignItems="center">
+                <FormControl size="small" sx={{ minWidth: 150, maxWidth: 200 }}>
+                    <InputLabel>פרויקט</InputLabel>
+                    <Select
+                        value={selectedProject}
+                        label="פרויקט"
+                        onChange={(e) => setSelectedProject(e.target.value)}
+                        disabled={isRunning}
+                    >
+                        {projects.map((p) => (
+                            <MenuItem key={p.id} value={p.id}>{p.name}</MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
 
-                    <TextField
-                        label="תיאור"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        fullWidth
-                        multiline
-                        rows={2}
+                <FormControl size="small" sx={{ minWidth: 150, maxWidth: 200 }}>
+                    <InputLabel>משימה</InputLabel>
+                    <Select
+                        value={selectedTaskId}
+                        label="משימה"
+                        onChange={(e) => setSelectedTaskId(e.target.value)}
+                        disabled={isRunning || !selectedProject}
+                    >
+                        <MenuItem value=""><em>ללא משימה</em></MenuItem>
+                        {tasks.map((t) => (
+                            <MenuItem key={t.id} value={t.id}>{t.name}</MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+
+                <TextField
+                    size="small"
+                    placeholder="תיאור..."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    sx={{ flexGrow: 1 }}
+                />
+            </Stack>
+
+            {/* Action Buttons */}
+            <Box sx={{ display: 'flex', gap: 1 }}>
+                {!isRunning ? (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<PlayArrowRoundedIcon />}
+                        onClick={handleStart}
+                        disabled={!selectedProject}
+                        sx={{ borderRadius: 2, px: 3 }}
+                    >
+                        התחל
+                    </Button>
+                ) : (
+                    <Button
+                        variant="contained"
+                        color="error"
+                        startIcon={<StopRoundedIcon />}
+                        onClick={handleStop}
                         sx={{
-                            '& .MuiOutlinedInput-root': { borderRadius: 2 }
+                            borderRadius: 2,
+                            px: 3,
+                            animation: `${pulse} 2s infinite`
                         }}
-                        inputProps={{
-                            style: { textAlign: 'center' }
-                        }}
-                    />
+                    >
+                        עצור
+                    </Button>
+                )}
 
-                    {tabValue === 0 ? (
-                        <Box sx={{ textAlign: 'center', py: 2 }}>
-                            <Box
-                                sx={{
-                                    fontFamily: 'monospace',
-                                    fontWeight: 700,
-                                    fontSize: '5rem',
-                                    mb: 4,
-                                    letterSpacing: -2,
-                                    background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                    textShadow: isRunning ? `0px 10px 20px ${alpha(theme.palette.primary.main, 0.2)}` : 'none',
-                                    transition: 'all 0.3s ease',
-                                    direction: 'ltr' // Force LTR for timer digits
-                                }}
-                            >
-                                {formatTime(elapsedTime)}
-                            </Box>
-
-                            {!isRunning ? (
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    size="large"
-                                    startIcon={<PlayArrowRoundedIcon sx={{ fontSize: 32 }} />}
-                                    onClick={handleStart}
-                                    disabled={!selectedProject}
-                                    sx={{
-                                        px: 6,
-                                        py: 2,
-                                        fontSize: '1.2rem',
-                                        borderRadius: 50,
-                                        boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.4)}`,
-                                        '&:hover': {
-                                            transform: 'translateY(-2px)',
-                                            boxShadow: `0 12px 32px ${alpha(theme.palette.primary.main, 0.5)}`,
-                                        },
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                >
-                                    התחל פוקוס
-                                </Button>
-                            ) : (
-                                <Button
-                                    variant="contained"
-                                    color="error"
-                                    size="large"
-                                    startIcon={<StopRoundedIcon sx={{ fontSize: 32 }} />}
-                                    onClick={handleStop}
-                                    sx={{
-                                        px: 6,
-                                        py: 2,
-                                        fontSize: '1.2rem',
-                                        borderRadius: 50,
-                                        animation: `${theme.palette.mode === 'dark' ? pulseDark : pulse} 2s infinite`,
-                                        boxShadow: `0 8px 24px ${alpha(theme.palette.error.main, 0.4)}`,
-                                        '&:hover': {
-                                            transform: 'translateY(-2px)',
-                                            boxShadow: `0 12px 32px ${alpha(theme.palette.error.main, 0.5)}`,
-                                        },
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                >
-                                    סיים סשן
-                                </Button>
-                            )}
-                        </Box>
-                    ) : (
-                        <Box component="form" onSubmit={handleManualSubmit}>
-                            <Stack spacing={3}>
-                                <TextField
-                                    type="date"
-                                    label="תאריך"
-                                    value={manualDate}
-                                    onChange={(e) => setManualDate(e.target.value)}
-                                    fullWidth
-                                    InputLabelProps={{ shrink: true }}
-                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
-                                    inputProps={{ style: { textAlign: 'center' } }}
-                                />
-                                <Stack direction="row" spacing={2}>
-                                    <TextField
-                                        type="time"
-                                        label="שעת התחלה"
-                                        value={manualStartTime}
-                                        onChange={(e) => setManualStartTime(e.target.value)}
-                                        fullWidth
-                                        InputLabelProps={{ shrink: true }}
-                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
-                                        inputProps={{ style: { textAlign: 'center' } }}
-                                    />
-                                    <TextField
-                                        type="time"
-                                        label="שעת סיום"
-                                        value={manualEndTime}
-                                        onChange={(e) => setManualEndTime(e.target.value)}
-                                        fullWidth
-                                        InputLabelProps={{ shrink: true }}
-                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
-                                        inputProps={{ style: { textAlign: 'center' } }}
-                                    />
-                                </Stack>
-                                <Button
-                                    type="submit"
-                                    variant="contained"
-                                    size="large"
-                                    startIcon={<EditCalendarRoundedIcon />}
-                                    sx={{
-                                        py: 1.5,
-                                        borderRadius: 2,
-                                        fontSize: '1.1rem'
-                                    }}
-                                >
-                                    הוסף רישום ידני
-                                </Button>
-                            </Stack>
-                        </Box>
-                    )}
-                </Stack>
+                <Tooltip title="הזנה ידנית">
+                    <IconButton onClick={() => setOpenManualDialog(true)} size="small" sx={{ bgcolor: alpha(theme.palette.divider, 0.1) }}>
+                        <EditCalendarRoundedIcon />
+                    </IconButton>
+                </Tooltip>
             </Box>
+
+            {/* Manual Entry Dialog */}
+            <Dialog open={openManualDialog} onClose={() => setOpenManualDialog(false)} maxWidth="xs" fullWidth dir="rtl">
+                <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    הוספת זמן ידנית
+                    <IconButton onClick={() => setOpenManualDialog(false)} size="small"><CloseIcon /></IconButton>
+                </DialogTitle>
+                <DialogContent dividers>
+                    <Stack spacing={3} sx={{ mt: 1 }}>
+                        <FormControl fullWidth size="small">
+                            <InputLabel>פרויקט</InputLabel>
+                            <Select
+                                value={selectedProject}
+                                label="פרויקט"
+                                onChange={(e) => setSelectedProject(e.target.value)}
+                            >
+                                {projects.map((p) => (
+                                    <MenuItem key={p.id} value={p.id}>{p.name}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <FormControl fullWidth size="small">
+                            <InputLabel>משימה</InputLabel>
+                            <Select
+                                value={selectedTaskId}
+                                label="משימה"
+                                onChange={(e) => setSelectedTaskId(e.target.value)}
+                                disabled={!selectedProject}
+                            >
+                                <MenuItem value=""><em>ללא</em></MenuItem>
+                                {tasks.map((t) => (
+                                    <MenuItem key={t.id} value={t.id}>{t.name}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <TextField
+                            label="תיאור"
+                            size="small"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            fullWidth
+                        />
+                        <TextField
+                            type="date"
+                            label="תאריך"
+                            size="small"
+                            value={manualDate}
+                            onChange={(e) => setManualDate(e.target.value)}
+                            fullWidth
+                            InputLabelProps={{ shrink: true }}
+                        />
+                        <Stack direction="row" spacing={2}>
+                            <TextField
+                                type="time"
+                                label="התחלה"
+                                size="small"
+                                value={manualStartTime}
+                                onChange={(e) => setManualStartTime(e.target.value)}
+                                fullWidth
+                                InputLabelProps={{ shrink: true }}
+                            />
+                            <TextField
+                                type="time"
+                                label="סיום"
+                                size="small"
+                                value={manualEndTime}
+                                onChange={(e) => setManualEndTime(e.target.value)}
+                                fullWidth
+                                InputLabelProps={{ shrink: true }}
+                            />
+                        </Stack>
+                    </Stack>
+                </DialogContent>
+                <DialogActions sx={{ p: 2 }}>
+                    <Button onClick={() => setOpenManualDialog(false)}>ביטול</Button>
+                    <Button variant="contained" onClick={handleManualSubmit} disabled={!selectedProject}>
+                        שמור
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Paper>
     );
 }

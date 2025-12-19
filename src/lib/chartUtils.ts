@@ -37,7 +37,6 @@ export const prepareProjectData = (projects: Project[], logs: TimeLog[]): Projec
             value: Number(((projectMap.get(p.id!) || 0) / 3600).toFixed(1)), // Convert seconds to hours
             color: p.color || '#3f51b5'
         }))
-        .filter(item => item.value > 0) // Only show projects with activity
         .sort((a, b) => b.value - a.value); // Sort desc
 };
 
@@ -66,7 +65,15 @@ export const prepareWeeklyActivity = (logs: TimeLog[]): WeeklyChartData[] => {
         if (!log.startTime) return;
 
         // Handle Timestamp or date string/number
-        const logDate = log.startTime.toDate ? log.startTime.toDate() : new Date(log.startTime);
+        let logDate: Date;
+        if (log.startTime && typeof log.startTime.toDate === 'function') {
+            logDate = log.startTime.toDate();
+        } else if (log.startTime && log.startTime.seconds) {
+            logDate = new Date(log.startTime.seconds * 1000);
+        } else {
+            logDate = new Date(log.startTime);
+        }
+
         const logDayStr = logDate.toLocaleDateString('he-IL');
 
         const dayEntry = last7Days.find(d => d.date === logDayStr);
@@ -80,4 +87,37 @@ export const prepareWeeklyActivity = (logs: TimeLog[]): WeeklyChartData[] => {
         ...d,
         hours: Number(d.hours.toFixed(1))
     }));
+};
+
+export const prepareTaskStatusData = (tasks: any[]) => {
+    let todo = 0;
+    let inProgress = 0;
+    let done = 0;
+
+    tasks.forEach(t => {
+        if (t.status === 'done' || t.isCompleted) done++;
+        else if (t.status === 'in-progress') inProgress++;
+        else todo++;
+    });
+
+    return [
+        { name: 'לביצוע', value: todo, color: '#f44336' }, // Red
+        { name: 'בתהליך', value: inProgress, color: '#ff9800' }, // Orange
+        { name: 'בוצע', value: done, color: '#4caf50' } // Green
+    ].filter(i => i.value > 0);
+};
+
+export const prepareProjectStatusData = (projects: Project[]) => {
+    let active = 0;
+    let completed = 0;
+
+    projects.forEach(p => {
+        if (p.status === 'completed') completed++;
+        else active++; // Default to active
+    });
+
+    return [
+        { name: 'פעיל', value: active, color: '#2196f3' }, // Blue
+        { name: 'הושלם', value: completed, color: '#8bc34a' } // Light Green
+    ].filter(i => i.value > 0);
 };

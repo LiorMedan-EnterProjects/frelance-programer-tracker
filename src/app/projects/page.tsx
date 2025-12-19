@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation';
 
 export default function ProjectsPage() {
     const { user } = useAuth();
-    const { projects, createNewProject, refreshData } = useData();
+    const { projects, logs, createNewProject, refreshData } = useData();
     const router = useRouter();
     // const [projects, setProjects] = useState<Project[]>([]); // Removed local state
     const [open, setOpen] = useState(false);
@@ -76,7 +76,7 @@ export default function ProjectsPage() {
                 </Button>
             </Box>
 
-            <ProjectList projects={projects} onDelete={handleDeleteProject} />
+            <ProjectList projects={projects} logs={logs} onDelete={handleDeleteProject} />
 
             <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
                 <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold' }}>יצירת פרויקט חדש</DialogTitle>

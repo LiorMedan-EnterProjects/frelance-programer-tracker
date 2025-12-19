@@ -29,12 +29,12 @@ export default function DashboardStats({ projects, logs }: DashboardStatsProps) 
                 borderRadius: 2,
                 bgcolor: `${color}.light`,
                 color: `${color}.main`,
-                ml: 2, // RTL: margin left instead of right
+                ml: 2, // RTL: margin left pushes neighbor to the left
                 display: 'flex'
             }}>
                 {icon}
             </Box>
-            <Box>
+            <Box sx={{ flexGrow: 1, textAlign: 'right' }}>
                 <Typography variant="body2" color="text.secondary">{title}</Typography>
                 <Typography variant="h5" fontWeight="bold">{value}</Typography>
             </Box>

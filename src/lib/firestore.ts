@@ -11,7 +11,8 @@ import {
   Timestamp,
   serverTimestamp,
   setDoc,
-  getDoc
+  getDoc,
+  arrayUnion
 } from "firebase/firestore";
 import { db } from "./firebase"; // Assuming db is exported from firebase.ts
 
@@ -27,10 +28,30 @@ export interface Project {
   createdAt?: any;
 }
 
+export interface SubTask {
+  id: string;
+  name: string;
+  status: 'active' | 'completed';
+}
+
+export interface Task {
+  id?: string;
+  projectId: string;
+  userId: string;
+  name: string;
+  isCompleted: boolean; // Keep for backward compatibility (mapped from status)
+  status: 'todo' | 'in-progress' | 'done'; // New field
+  createdAt: number;
+  subTasks: SubTask[];
+}
+
 export interface TimeLog {
   id?: string;
   userId: string;
   projectId: string;
+  taskId?: string;
+  subTaskId?: string;
+  taskName?: string; // Denormalized for display
   startTime: any;
   endTime: any | null;
   duration: number; // in seconds
@@ -125,6 +146,125 @@ export const getTimeLogs = async (userId: string) => {
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TimeLog));
   } catch (e) {
     console.error("Error getting time logs: ", e);
+    throw e;
+  }
+};
+
+// Tasks API
+export const addTask = async (userId: string, projectId: string, name: string) => {
+  try {
+    const taskRef = doc(collection(db, `users/${userId}/projects/${projectId}/tasks`));
+    const task: Task = {
+      id: taskRef.id,
+      projectId,
+      userId,
+      name,
+      isCompleted: false,
+      status: 'todo', // Default status
+      createdAt: Date.now(),
+      subTasks: []
+    };
+    await setDoc(taskRef, task);
+    return task;
+  } catch (error) {
+    console.error("Error adding task: ", error);
+    throw error;
+  }
+};
+
+export const addSubTask = async (userId: string, projectId: string, taskId: string, subTaskName: string) => {
+  try {
+    const taskRef = doc(db, "users", userId, "projects", projectId, "tasks", taskId);
+    const newSubTask: SubTask = {
+      id: Math.random().toString(36).substr(2, 9), // Simple ID generation
+      name: subTaskName,
+      status: 'active'
+    };
+    await updateDoc(taskRef, {
+      subTasks: arrayUnion(newSubTask)
+    });
+    return newSubTask;
+  } catch (e) {
+    console.error("Error adding sub-task: ", e);
+    throw e;
+  }
+};
+
+export const getProjectTasks = async (userId: string, projectId: string) => {
+  try {
+    const tasksRef = collection(db, "users", userId, "projects", projectId, "tasks");
+    const q = query(tasksRef, orderBy("createdAt", "desc"));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task));
+  } catch (e) {
+    console.error("Error getting project tasks: ", e);
+    return [];
+  }
+};
+
+export const getAllUserTasks = async (userId: string, projects: Project[]) => {
+  try {
+    const allTasks: Task[] = [];
+    // Helper to fetch tasks for one project
+    const fetchForProject = async (projectId: string) => {
+      const tasksRef = collection(db, "users", userId, "projects", projectId, "tasks");
+      const snapshot = await getDocs(tasksRef);
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task));
+    };
+
+    // Run in parallel
+    const results = await Promise.all(projects.map(async (p) => {
+      if (p.id) return await fetchForProject(p.id);
+      return [];
+    }));
+
+    results.forEach(tasks => allTasks.push(...tasks));
+    return allTasks;
+  } catch (e) {
+    console.error("Error getting all user tasks:", e);
+    return [];
+  }
+};
+
+export const updateTaskStatus = async (userId: string, projectId: string, taskId: string, status: 'todo' | 'in-progress' | 'done') => {
+  try {
+    const taskRef = doc(db, `users/${userId}/projects/${projectId}/tasks`, taskId);
+    await updateDoc(taskRef, {
+      status,
+      isCompleted: status === 'done' // Auto-update legacy field
+    });
+  } catch (error) {
+    console.error("Error updating task status: ", error);
+    throw error;
+  }
+};
+
+export const updateTask = async (userId: string, projectId: string, taskId: string, updates: Partial<Task>) => {
+  try {
+    const taskRef = doc(db, "users", userId, "projects", projectId, "tasks", taskId);
+    await updateDoc(taskRef, updates);
+  } catch (e) {
+    console.error("Error updating task: ", e);
+    throw e;
+  }
+};
+
+export const deleteTask = async (userId: string, projectId: string, taskId: string) => {
+  try {
+    const taskRef = doc(db, "users", userId, "projects", projectId, "tasks", taskId);
+    await deleteDoc(taskRef);
+  } catch (e) {
+    console.error("Error deleting task: ", e);
+    throw e;
+  }
+};
+
+export const updateSubTask = async (userId: string, projectId: string, taskId: string, subTasks: SubTask[]) => {
+  try {
+    const taskRef = doc(db, "users", userId, "projects", projectId, "tasks", taskId);
+    await updateDoc(taskRef, { subTasks });
+  } catch (e) {
+    console.error("Error updating sub-tasks: ", e);
     throw e;
   }
 };

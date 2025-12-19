@@ -12,17 +12,12 @@ interface Props {
 export default function WeeklyActivityChart({ data }: Props) {
     const theme = useTheme();
 
-    if (data.every(d => d.hours === 0)) {
-        return (
-            <Paper sx={{ p: 3, height: 350, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Typography color="text.secondary">אין מספיק נתונים להצגה</Typography>
-            </Paper>
-        );
-    }
+    // Remove early return to always show the grid
+    // if (data.every(d => d.hours === 0)) { ... }
 
     return (
         <Paper sx={{ p: 3, height: 350, display: 'flex', flexDirection: 'column' }}>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom sx={{ textAlign: 'right' }}>
                 פעילות ב-7 הימים האחרונים
             </Typography>
             <Box sx={{ flexGrow: 1, minHeight: 0, width: '100%' }}>

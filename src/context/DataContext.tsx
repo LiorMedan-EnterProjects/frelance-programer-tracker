@@ -2,11 +2,12 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
-import { Project, TimeLog, getProjects, getTimeLogs, addProject, addTimeLog } from '@/lib/firestore';
+import { Project, TimeLog, Task, getProjects, getTimeLogs, addProject, addTimeLog, getAllUserTasks } from '@/lib/firestore';
 
 interface DataContextType {
     projects: Project[];
     logs: TimeLog[];
+    tasks: Task[]; // Added tasks
     loading: boolean;
     refreshData: () => Promise<void>;
     createNewProject: (project: Omit<Project, 'id' | 'createdAt' | 'userId'>) => Promise<void>;
@@ -19,6 +20,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const { user } = useAuth();
     const [projects, setProjects] = useState<Project[]>([]);
     const [logs, setLogs] = useState<TimeLog[]>([]);
+    const [tasks, setTasks] = useState<Task[]>([]); // Tasks State
     const [loading, setLoading] = useState(true);
 
     const refreshData = async () => {
@@ -28,12 +30,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
         console.log("refreshData: Fetching for user:", user.uid);
         try {
+            // First fetch projects and logs
             const [projectsData, logsData] = await Promise.all([
                 getProjects(user.uid),
                 getTimeLogs(user.uid)
             ]);
+
+            // Then fetch tasks using the projects list
+            const tasksData = await getAllUserTasks(user.uid, projectsData);
+
             setProjects(projectsData);
             setLogs(logsData);
+            setTasks(tasksData);
         } catch (error) {
             console.error("Error fetching data:", error);
         } finally {
@@ -47,6 +55,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         } else {
             setProjects([]);
             setLogs([]);
+            setTasks([]);
             setLoading(false);
         }
     }, [user]);
@@ -105,7 +114,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <DataContext.Provider value={{ projects, logs, loading, refreshData, createNewProject, createNewTimeLog }}>
+        <DataContext.Provider value={{ projects, logs, tasks, loading, refreshData, createNewProject, createNewTimeLog }}>
             {children}
         </DataContext.Provider>
     );
