@@ -103,7 +103,7 @@ export default function TaskModal({ open, onClose, onSave, task, defaultProjectI
                 }}
             >
                 <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="h6" fontWeight="bold">
+                    <Typography component="div" variant="h6" fontWeight="bold">
                         {task ? 'ערוך משימה' : 'משימה חדשה'}
                     </Typography>
                     <IconButton onClick={onClose} size="small">
