@@ -51,6 +51,7 @@ export default function Navbar() {
 
     const navItems = [
         { label: "לוח בקרה", path: "/dashboard", icon: <DashboardIcon sx={{ marginBottom: "0px !important", marginRight: 1 }} /> },
+        { label: "לוח משימות", path: "/kanban", icon: <AssignmentIcon sx={{ marginBottom: "0px !important", marginRight: 1 }} /> },
     ];
 
     // Determine active tab

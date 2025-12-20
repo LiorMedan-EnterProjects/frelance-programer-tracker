@@ -154,7 +154,7 @@ export const getTimeLogs = async (userId: string) => {
 };
 
 // Tasks API
-export const addTask = async (userId: string, projectId: string, name: string, description: string = '', priority: 'high' | 'medium' | 'low' = 'medium', dueDate: number | null = null) => {
+export const addTask = async (userId: string, projectId: string, name: string, description: string = '', priority: 'high' | 'medium' | 'low' = 'medium', dueDate: number | null = null, status: 'todo' | 'in-progress' | 'done' = 'todo') => {
   try {
     const taskRef = doc(collection(db, `users/${userId}/projects/${projectId}/tasks`));
     const task: Task = {
@@ -163,8 +163,8 @@ export const addTask = async (userId: string, projectId: string, name: string, d
       userId,
       name,
       description,
-      isCompleted: false,
-      status: 'todo', // Default status
+      isCompleted: status === 'done',
+      status: status, // Use provided status
       priority,
       dueDate,
       createdAt: Date.now(),
