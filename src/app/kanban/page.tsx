@@ -146,7 +146,18 @@ export default function KanbanPage() {
                         startIcon={<AddIcon />}
                         onClick={() => setIsProjectModalOpen(true)}
                         variant="outlined"
-                        sx={{ height: 56, whiteSpace: 'nowrap', px: 3 }} // Match height of Select (default 56px)
+                        color="inherit"
+                        sx={{
+                            height: 56,
+                            whiteSpace: 'nowrap',
+                            px: 4, // More padding
+                            minWidth: 'fit-content', // Ensure text fits
+                            borderColor: 'rgba(255, 255, 255, 0.23)', // Match MUI Input default border in dark mode
+                            '&:hover': {
+                                borderColor: 'text.primary',
+                                backgroundColor: 'rgba(255, 255, 255, 0.04)'
+                            }
+                        }}
                     >
                         פרויקט חדש
                     </Button>
