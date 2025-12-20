@@ -19,18 +19,34 @@ export default function TimelineChart({ tasks, onTaskClick }: TimelineChartProps
 
     // Map Tasks to GanttTasks
     const ganttTasks: GanttTask[] = tasks.map(t => {
-        // Determine start date: usage startDate > createdAt
-        let start = new Date(t.createdAt);
+        // Safe access to dates
+        const now = new Date();
+        const created = t.createdAt ? new Date(t.createdAt) : now;
+
+        // Determine start date
+        let start = created;
         if (t.startDate) {
-            start = new Date(t.startDate);
+            const parsedStart = new Date(t.startDate);
+            if (!isNaN(parsedStart.getTime())) {
+                start = parsedStart;
+            }
+        }
+        // Fallback for invalid start
+        if (isNaN(start.getTime())) {
+            start = now;
         }
 
-        // Determine end date: dueDate > start + 1 day
+        // Determine end date
         let end = new Date(start.getTime() + 86400000); // Default 1 day
         if (t.dueDate) {
-            end = new Date(t.dueDate);
-            // Ensure end >= start
-            if (end < start) end = new Date(start.getTime() + 86400000);
+            const parsedEnd = new Date(t.dueDate);
+            if (!isNaN(parsedEnd.getTime())) {
+                end = parsedEnd;
+            }
+        }
+        // Ensure end >= start
+        if (end <= start) {
+            end = new Date(start.getTime() + 86400000);
         }
 
         // Progress based on status
@@ -57,12 +73,12 @@ export default function TimelineChart({ tasks, onTaskClick }: TimelineChartProps
     });
 
     return (
-        <div style={{ direction: 'ltr', overflowX: 'auto' }}>
+        <div style={{ direction: 'ltr', width: '100%', height: '500px', overflowX: 'auto' }}>
             <Gantt
                 tasks={ganttTasks}
                 viewMode={ViewMode.Day}
                 locale="he"
-                rtl={false} // Library RTL support can be sketchy, keeping LTR for chart mechanic but Hebrew text
+                rtl={false}
                 listCellWidth="155px"
                 columnWidth={60}
                 barFill={60}
