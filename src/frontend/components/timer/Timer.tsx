@@ -31,6 +31,7 @@ import { Project, addTimeLog, getProjectTasks, Task } from '@/backend/firestore'
 import { Timestamp } from 'firebase/firestore';
 import { keyframes } from '@emotion/react';
 import ProjectModal from '../projects/ProjectModal';
+import TimeLogModal from './TimeLogModal';
 import { useData } from '../../context/DataContext';
 
 // ... keyframes (pulse, pulseDark) ...
@@ -69,9 +70,6 @@ export default function Timer({ projects: propProjects, userId, onLogAdded }: Ti
 
     // Manual Entry State
     const [openManualDialog, setOpenManualDialog] = useState(false);
-    const [manualDate, setManualDate] = useState(new Date().toISOString().split('T')[0]);
-    const [manualStartTime, setManualStartTime] = useState('09:00');
-    const [manualEndTime, setManualEndTime] = useState('10:00');
 
     // Create Project State
     const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
@@ -137,31 +135,13 @@ export default function Timer({ projects: propProjects, userId, onLogAdded }: Ti
         }
     };
 
-    const handleManualSubmit = async () => {
-        if (!selectedProject) return; // Should be handled by validation in form
-        const start = new Date(`${manualDate}T${manualStartTime}`);
-        const end = new Date(`${manualDate}T${manualEndTime}`);
-        const duration = Math.floor((end.getTime() - start.getTime()) / 1000);
-
-        if (duration <= 0) {
-            alert("שעת הסיום חייבת להיות אחרי שעת ההתחלה.");
-            return;
-        }
-
+    const handleManualSubmit = async (logData: any) => {
         try {
-            const task = tasks.find(t => t.id === selectedTaskId);
             await addTimeLog({
-                userId,
-                projectId: selectedProject,
-                taskId: selectedTaskId || undefined,
-                taskName: task ? task.name : undefined,
-                startTime: Timestamp.fromDate(start),
-                endTime: Timestamp.fromDate(end),
-                duration,
-                description
+                ...logData,
+                userId
             });
             onLogAdded();
-            setDescription('');
             setOpenManualDialog(false);
             alert("הדיווח נוסף בהצלחה!");
         } catch (error) {
@@ -306,84 +286,13 @@ export default function Timer({ projects: propProjects, userId, onLogAdded }: Ti
             </Box>
 
             {/* Manual Entry Dialog */}
-            <Dialog open={openManualDialog} onClose={() => setOpenManualDialog(false)} maxWidth="xs" fullWidth dir="rtl">
-                <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    הוספת זמן ידנית
-                    <IconButton onClick={() => setOpenManualDialog(false)} size="small"><CloseIcon /></IconButton>
-                </DialogTitle>
-                <DialogContent dividers>
-                    <Stack spacing={3} sx={{ mt: 1 }}>
-                        <FormControl fullWidth size="small">
-                            <InputLabel>פרויקט</InputLabel>
-                            <Select
-                                value={selectedProject}
-                                label="פרויקט"
-                                onChange={(e) => setSelectedProject(e.target.value)}
-                            >
-                                {projects.map((p) => (
-                                    <MenuItem key={p.id} value={p.id}>{p.name}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <FormControl fullWidth size="small">
-                            <InputLabel>משימה</InputLabel>
-                            <Select
-                                value={selectedTaskId}
-                                label="משימה"
-                                onChange={(e) => setSelectedTaskId(e.target.value)}
-                                disabled={!selectedProject}
-                            >
-                                <MenuItem value=""><em>ללא</em></MenuItem>
-                                {tasks.map((t) => (
-                                    <MenuItem key={t.id} value={t.id}>{t.name}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <TextField
-                            label="תיאור"
-                            size="small"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            fullWidth
-                        />
-                        <TextField
-                            type="date"
-                            label="תאריך"
-                            size="small"
-                            value={manualDate}
-                            onChange={(e) => setManualDate(e.target.value)}
-                            fullWidth
-                            InputLabelProps={{ shrink: true }}
-                        />
-                        <Stack direction="row" spacing={2}>
-                            <TextField
-                                type="time"
-                                label="התחלה"
-                                size="small"
-                                value={manualStartTime}
-                                onChange={(e) => setManualStartTime(e.target.value)}
-                                fullWidth
-                                InputLabelProps={{ shrink: true }}
-                            />
-                            <TextField
-                                type="time"
-                                label="סיום"
-                                size="small"
-                                value={manualEndTime}
-                                onChange={(e) => setManualEndTime(e.target.value)}
-                                fullWidth
-                                InputLabelProps={{ shrink: true }}
-                            />
-                        </Stack>
-                    </Stack>
-                </DialogContent>
-                <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setOpenManualDialog(false)}>ביטול</Button>
-                    <Button variant="contained" onClick={handleManualSubmit} disabled={!selectedProject}>
-                        שמור
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <TimeLogModal
+                open={openManualDialog}
+                onClose={() => setOpenManualDialog(false)}
+                onSave={handleManualSubmit}
+                projects={projects}
+                userId={userId}
+            />
 
             {/* Quick Create Project Modal */}
             <ProjectModal

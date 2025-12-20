@@ -29,7 +29,7 @@ import { prepareTaskStatusData, prepareProjectStatusData } from "@/frontend/util
 
 export default function DashboardPage() {
     const { user, loading } = useAuth();
-    const { projects, logs, tasks, createNewProject } = useData();
+    const { projects, logs, tasks, createNewProject, refreshData } = useData();
     const router = useRouter();
 
     // Modal State
@@ -177,7 +177,12 @@ export default function DashboardPage() {
                                 <Button size="small" onClick={() => router.push('/timer')}>הכל</Button>
                             </Box>
                             <Box sx={{ flexGrow: 1, overflowY: 'auto', pr: 1 }}>
-                                <TimeLogList logs={activeLogs.slice(0, 20)} projects={projects} />
+                                <TimeLogList
+                                    logs={activeLogs.slice(0, 20)}
+                                    projects={projects}
+                                    userId={user.uid}
+                                    onLogUpdated={refreshData}
+                                />
                             </Box>
                         </Paper>
                     </Grid>
