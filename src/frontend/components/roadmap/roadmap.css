@@ -1,0 +1,97 @@
+/* Scoped Dark Mode Overrides for Gantt Chart */
+#roadmap-gantt-wrapper {
+    /* General Text Color */
+    color: #e2e8f0;
+    font-family: 'Rubik', sans-serif, -apple-system, BlinkMacSystemFont !important;
+}
+
+/* Override SVG Text Fills */
+#roadmap-gantt-wrapper text {
+    fill: #94a3b8 !important;
+    /* Secondary text color */
+}
+
+/* Selected/Hovered Text */
+#roadmap-gantt-wrapper ._35nLX {
+    fill: #f8fafc !important;
+}
+
+/* Grid Background Rows (Chart Side) */
+#roadmap-gantt-wrapper .grid-row {
+    fill: #0f172a !important;
+    /* Dark background */
+}
+
+#roadmap-gantt-wrapper .grid-row:nth-child(even) {
+    fill: #1e293b !important;
+    /* Slightly lighter for stripe effect */
+}
+
+/* Task List Rows (Left Side) */
+#roadmap-gantt-wrapper .taskList {
+    background-color: #0f172a !important;
+}
+
+#roadmap-gantt-wrapper .taskList .tRow {
+    background-color: #0f172a !important;
+    color: #e2e8f0 !important;
+    border-bottom: 1px solid #334155 !important;
+}
+
+#roadmap-gantt-wrapper .taskList .tRow:nth-child(even) {
+    background-color: #1e293b !important;
+}
+
+/* Headers */
+#roadmap-gantt-wrapper .header {
+    background-color: #1e293b !important;
+    /* Darker header */
+    color: #f8fafc !important;
+    border-bottom: 1px solid #475569 !important;
+}
+
+/* Scrollbar styling for the chart */
+#roadmap-gantt-wrapper ::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+    background: #0f172a;
+}
+
+#roadmap-gantt-wrapper ::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 4px;
+}
+
+#roadmap-gantt-wrapper ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+/* Tooltip */
+#roadmap-gantt-wrapper ._3P2Nj {
+    background-color: #1e293b !important;
+    color: #fff !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
+    border: 1px solid #475569 !important;
+    border-radius: 6px !important;
+}
+
+/* Today Line */
+#roadmap-gantt-wrapper line[stroke="#ff0000"] {
+    stroke: #ef4444 !important;
+    /* Tailwind red-500 */
+    stroke-width: 2px !important;
+}
+
+/* Calendar Header text */
+#roadmap-gantt-wrapper .calendar-header text {
+    fill: #cbd5e1 !important;
+}
+
+/* Remove white backgrounds from rects that shouldn't have it */
+#roadmap-gantt-wrapper rect[fill="#ffffff"] {
+    fill: transparent !important;
+}
+
+#roadmap-gantt-wrapper rect[fill="#fff"] {
+    fill: transparent !important;
+}
