@@ -90,11 +90,11 @@ export default function DashboardPage() {
                 )}
 
                 {/* Dashboard Header */}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Box sx={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 3, minHeight: 40 }}>
                     <Typography variant="h4" component="h1" fontWeight="bold">
                         לוח בקרה
                     </Typography>
-                    <Box sx={{ display: 'flex', gap: 2 }}>
+                    <Box sx={{ position: 'absolute', left: 0, display: 'flex', gap: 2 }}>
                         <TimerDialogTrigger />
                         <Button
                             variant="contained"
