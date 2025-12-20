@@ -37,68 +37,108 @@ export default function KanbanCard({ task, onEdit }: KanbanCardProps) {
             style={style}
             {...attributes}
             {...listeners}
-            elevation={isDragging ? 4 : 1}
+            elevation={0}
+            variant="outlined"
             sx={{
-                p: 2,
-                mb: 2,
+                p: 1.5,
+                mb: 1, // Tighter spacing
                 cursor: 'grab',
                 '&:active': { cursor: 'grabbing' },
-                backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fff',
+                backgroundColor: theme.palette.mode === 'dark' ? '#161b22' : '#ffffff', // GitHub Dark/Light bg
+                borderColor: theme.palette.mode === 'dark' ? '#30363d' : '#d0d7de',
+                borderRadius: 2,
                 '&:hover': {
-                    boxShadow: theme.shadows[3],
-                    backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#fafafa'
+                    borderColor: theme.palette.primary.main,
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
                 },
-                borderLeft: `4px solid ${task.priority === 'high' ? theme.palette.error.main :
-                    task.priority === 'low' ? theme.palette.success.main :
-                        theme.palette.warning.main
-                    }`,
                 position: 'relative',
-                direction: 'rtl', // Ensure RTL internal layout
-                '&:hover .edit-button': { opacity: 1 }
+                direction: 'rtl'
             }}
         >
-            <Stack spacing={1}>
+            <Box display="flex" flexDirection="column" gap={0.5}>
+                {/* Header: Title and Priority Dot */}
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start">
-                    <Typography variant="body1" fontWeight="medium" sx={{ wordBreak: 'break-word' }}>
+                    <Typography
+                        variant="body2"
+                        fontWeight="600"
+                        color="text.primary"
+                        sx={{
+                            wordBreak: 'break-word',
+                            lineHeight: 1.4,
+                            fontSize: '0.9rem'
+                        }}
+                    >
                         {task.name}
                     </Typography>
-                    {task.priority === 'high' && (
-                        <Chip label="דחוף" size="small" color="error" sx={{ height: 20, fontSize: '0.7rem' }} />
+
+                    {onEdit && (
+                        <Box
+                            className="edit-button"
+                            component="span"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onEdit(task);
+                            }}
+                            sx={{
+                                opacity: 0,
+                                transition: 'opacity 0.2s',
+                                cursor: 'pointer',
+                                padding: '2px',
+                                borderRadius: '4px',
+                                '&:hover': { bgcolor: 'action.hover' },
+                                '.MuiPaper-root:hover &': { opacity: 1 } // Show on card hover
+                            }}
+                        >
+                            <EditIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                        </Box>
                     )}
                 </Box>
 
-                {task.description && (
-                    <Typography variant="body2" color="text.secondary" sx={{
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                        fontSize: '0.85rem'
-                    }}>
-                        {task.description}
-                    </Typography>
-                )}
+                {/* Subtitle / Metadata Row */}
+                <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
+                    {/* Priority Indicator */}
+                    {task.priority !== 'medium' && (
+                        <Box display="flex" alignItems="center" title={`עדיפות ${task.priority === 'high' ? 'גבוהה' : 'נמוכה'}`}>
+                            <Box sx={{
+                                width: 8,
+                                height: 8,
+                                borderRadius: '50%',
+                                bgcolor: task.priority === 'high' ? 'error.main' : 'success.main',
+                                mr: 0.5
+                            }} />
+                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+                                {task.priority === 'high' ? 'High' : 'Low'}
+                            </Typography>
+                        </Box>
+                    )}
 
-                <Divider sx={{ my: 0.5 }} />
-
-                <Box display="flex" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={1}>
                     {task.dueDate && (
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            📅 {new Date(task.dueDate).toLocaleDateString('he-IL')}
+                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            📅 {new Date(task.dueDate).toLocaleDateString('he-IL', { day: 'numeric', month: 'numeric' })}
                         </Typography>
                     )}
 
                     {task.subTasks && task.subTasks.length > 0 && (
-                        <Chip
-                            label={`${task.subTasks.filter(st => st.status === 'completed').length}/${task.subTasks.length}`}
-                            size="small"
-                            variant="outlined"
-                            color={task.subTasks.every(st => st.status === 'completed') ? 'success' : 'default'}
-                            sx={{ height: 20, fontSize: '0.7rem' }}
-                        />
+                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            ☑ {task.subTasks.filter(st => st.status === 'completed').length}/{task.subTasks.length}
+                        </Typography>
                     )}
                 </Box>
-            </Stack>
+
+                {/* Optional: Minimal Description preview if exists */}
+                {task.description && (
+                    <Typography variant="caption" color="text.secondary" sx={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 1,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        mt: 0.5,
+                        fontSize: '0.75rem'
+                    }}>
+                        {task.description}
+                    </Typography>
+                )}
+            </Box>
         </Paper>
     );
 }
