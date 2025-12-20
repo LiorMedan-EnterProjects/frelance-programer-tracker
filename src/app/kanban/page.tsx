@@ -120,34 +120,36 @@ export default function KanbanPage() {
         <Container maxWidth="xl" sx={{ py: 4, height: 'calc(100vh - 80px)' }}> {/* Full height minus header approx */}
             <Box sx={{ mb: 4, display: 'grid', gridTemplateColumns: '250px 1fr 250px', alignItems: 'center', gap: 2, direction: 'rtl' }}>
                 {/* Right Side (Start in RTL) - Empty or Spacer */}
-                <Box sx={{ display: 'flex' }}>
-                    <Button
-                        startIcon={<AddIcon />}
-                        onClick={() => setIsProjectModalOpen(true)}
-                        variant="outlined"
-                        size="small"
-                    >
-                        פרויקט חדש
-                    </Button>
-                </Box>
+                {/* Right Side (Start in RTL) - Title? No, Title is Center. Spacer? */}
+                <Box />
 
                 {/* Center Title */}
                 <Typography variant="h4" fontWeight="bold" align="center">לוח משימות</Typography>
 
-                {/* Left Side (End in RTL) - Select */}
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <FormControl sx={{ minWidth: 250, maxWidth: '100%' }}>
+                {/* Left Side (End in RTL) - Controls */}
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                    <FormControl sx={{ minWidth: 200 }}>
                         <InputLabel>בחר פרויקט</InputLabel>
                         <Select
                             value={selectedProjectId}
                             label="בחר פרויקט"
                             onChange={(e) => setSelectedProjectId(e.target.value)}
+                            sx={{ height: 56 }} // Explicit height match
                         >
                             {projects.map((p) => (
                                 <MenuItem key={p.id} value={p.id}>{p.name}</MenuItem>
                             ))}
                         </Select>
                     </FormControl>
+
+                    <Button
+                        startIcon={<AddIcon />}
+                        onClick={() => setIsProjectModalOpen(true)}
+                        variant="outlined"
+                        sx={{ height: 56, whiteSpace: 'nowrap', px: 3 }} // Match height of Select (default 56px)
+                    >
+                        פרויקט חדש
+                    </Button>
                 </Box>
             </Box>
 
