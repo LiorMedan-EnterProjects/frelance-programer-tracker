@@ -17,6 +17,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import TimelineIcon from "@mui/icons-material/Timeline";
 import LoginIcon from "@mui/icons-material/Login";
 import { useAuth } from "@/frontend/context/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
@@ -52,6 +53,7 @@ export default function Navbar() {
     const navItems = [
         { label: "לוח בקרה", path: "/dashboard", icon: <DashboardIcon sx={{ marginBottom: "0px !important", marginRight: 1 }} /> },
         { label: "לוח משימות", path: "/kanban", icon: <AssignmentIcon sx={{ marginBottom: "0px !important", marginRight: 1 }} /> },
+        { label: "מפת דרכים", path: "/roadmap", icon: <TimelineIcon sx={{ marginBottom: "0px !important", marginRight: 1 }} /> },
     ];
 
     // Determine active tab

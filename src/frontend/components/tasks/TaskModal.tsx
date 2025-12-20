@@ -37,6 +37,7 @@ export default function TaskModal({ open, onClose, onSave, task, defaultProjectI
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [priority, setPriority] = useState<'high' | 'medium' | 'low'>('medium');
+    const [startDate, setStartDate] = useState<number | null>(null);
     const [dueDate, setDueDate] = useState<number | null>(null);
     const [subTasks, setSubTasks] = useState<SubTask[]>([]);
     const [newSubTaskName, setNewSubTaskName] = useState('');
@@ -47,6 +48,7 @@ export default function TaskModal({ open, onClose, onSave, task, defaultProjectI
                 setName(task.name);
                 setDescription(task.description || '');
                 setPriority(task.priority || 'medium');
+                setStartDate(task.startDate || null);
                 setDueDate(task.dueDate || null);
                 setSubTasks(task.subTasks || []);
             } else {
@@ -54,6 +56,7 @@ export default function TaskModal({ open, onClose, onSave, task, defaultProjectI
                 setName('');
                 setDescription('');
                 setPriority('medium');
+                setStartDate(null);
                 setDueDate(null);
                 setSubTasks([]);
             }
@@ -67,6 +70,7 @@ export default function TaskModal({ open, onClose, onSave, task, defaultProjectI
             name,
             description,
             priority,
+            startDate,
             dueDate,
             subTasks
         };
@@ -155,6 +159,12 @@ export default function TaskModal({ open, onClose, onSave, task, defaultProjectI
                                 </MenuItem>
                             </TextField>
 
+                            <DatePicker
+                                label="תאריך התחלה"
+                                value={startDate ? new Date(startDate) : null}
+                                onChange={(newValue: Date | null) => setStartDate(newValue ? newValue.getTime() : null)}
+                                slotProps={{ textField: { fullWidth: true } }}
+                            />
                             <DatePicker
                                 label="תאריך יעד"
                                 value={dueDate ? new Date(dueDate) : null}
