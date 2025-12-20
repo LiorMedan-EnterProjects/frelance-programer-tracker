@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
@@ -19,7 +18,7 @@ import { useData } from "@/frontend/context/DataContext";
 
 import DashboardStats from "@/frontend/components/dashboard/DashboardStats";
 import TimeLogList from "@/frontend/components/timer/TimeLogList";
-import Timer from "@/frontend/components/timer/Timer";
+import TimerDialogTrigger from "@/frontend/components/timer/TimerDialogTrigger"; // Import new trigger
 import ProjectList from "@/frontend/components/projects/ProjectList";
 import HoursByProjectChart from "@/frontend/components/dashboard/HoursByProjectChart";
 import WeeklyActivityChart from "@/frontend/components/dashboard/WeeklyActivityChart";
@@ -71,10 +70,6 @@ export default function DashboardPage() {
         return null; // Will redirect
     }
 
-    const handleLogAdded = () => {
-        // DataContext handles real-time updates
-    };
-
     const handleCreateProject = async (projectData: any) => {
         try {
             await createNewProject(projectData);
@@ -99,30 +94,24 @@ export default function DashboardPage() {
                     <Typography variant="h4" component="h1" fontWeight="bold">
                         לוח בקרה
                     </Typography>
-                    <Button
-                        variant="contained"
-                        startIcon={<AddIcon />}
-                        onClick={() => setIsProjectModalOpen(true)}
-                    >
-                        פרויקט חדש
-                    </Button>
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                        <TimerDialogTrigger />
+                        <Button
+                            variant="contained"
+                            startIcon={<AddIcon />}
+                            onClick={() => setIsProjectModalOpen(true)}
+                        >
+                            פרויקט חדש
+                        </Button>
+                    </Box>
                 </Box>
 
-                {/* 1. Timer (Top Priority) */}
-                <Box sx={{ mb: 3 }}>
-                    <Timer
-                        projects={projects}
-                        userId={user.uid}
-                        onLogAdded={handleLogAdded}
-                    />
-                </Box>
-
-                {/* 2. Stats Cards */}
+                {/* 1. Stats Cards (Moved up as Timer is now in header) */}
                 <Box sx={{ mb: 3 }}>
                     <DashboardStats projects={projects} logs={activeLogs} />
                 </Box>
 
-                {/* 3. Charts Area - Status & Completion */}
+                {/* 2. Charts Area - Status & Completion */}
                 <Grid container spacing={2} sx={{ mb: 3 }}>
                     <Grid size={{ xs: 12, md: 6 }}>
                         <Paper sx={{ p: 2, borderRadius: 3, height: '100%' }}>
@@ -142,7 +131,7 @@ export default function DashboardPage() {
                     </Grid>
                 </Grid>
 
-                {/* 4. Bottom Area: Projects & Recent Activity */}
+                {/* 3. Bottom Area: Projects & Recent Activity */}
                 <Grid container spacing={2} sx={{ height: { md: 400, xs: 'auto' } }}> {/* Fixed height on desktop */}
                     <Grid size={{ xs: 12, md: 6 }} sx={{ height: '100%' }}>
                         <Paper sx={{ p: 2, borderRadius: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -198,4 +187,3 @@ export default function DashboardPage() {
         </Container>
     );
 }
-

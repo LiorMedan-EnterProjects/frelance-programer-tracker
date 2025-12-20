@@ -5,6 +5,7 @@ import { AuthProvider } from "@/frontend/context/AuthContext";
 import { ColorModeProvider } from "@/frontend/context/ThemeContext";
 import { DataProvider } from "@/frontend/context/DataContext";
 import AppShell from "@/frontend/components/AppShell";
+import { TimerProvider } from "@/frontend/context/TimerContext";
 
 const heebo = Heebo({ subsets: ["hebrew", "latin"] });
 
@@ -25,9 +26,11 @@ export default function RootLayout({
           <ThemeRegistry>
             <ColorModeProvider>
               <DataProvider>
-                <AppShell>
-                  {children}
-                </AppShell>
+                <TimerProvider>
+                  <AppShell>
+                    {children}
+                  </AppShell>
+                </TimerProvider>
               </DataProvider>
             </ColorModeProvider>
           </ThemeRegistry>

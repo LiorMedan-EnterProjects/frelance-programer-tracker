@@ -1,54 +1,48 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { Container, Typography, Box } from '@mui/material';
+import { useEffect, useState, useMemo } from 'react';
+import { Container, Typography, Box, Paper, Button } from '@mui/material';
 import { useAuth } from '@/frontend/context/AuthContext';
-import { getProjects, getTimeLogs, Project, TimeLog } from '@/backend/firestore';
-import Timer from '@/frontend/components/timer/Timer';
-
+import { useData } from '@/frontend/context/DataContext'; // Use global data
+import TimerDialogTrigger from '@/frontend/components/timer/TimerDialogTrigger';
+import TimeLogList from '@/frontend/components/timer/TimeLogList';
 import { useRouter } from 'next/navigation';
 
 export default function TimerPage() {
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
+    const { projects, logs, refreshData } = useData();
     const router = useRouter();
-    const [projects, setProjects] = useState<Project[]>([]);
-    const [logs, setLogs] = useState<TimeLog[]>([]);
 
-    const fetchData = async () => {
-        if (!user) return;
-        try {
-            const [projectsData, logsData] = await Promise.all([
-                getProjects(user.uid),
-                getTimeLogs(user.uid)
-            ]);
-            setProjects(projectsData);
-            setLogs(logsData);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        }
-    };
+    // Filter active logs (if associated with existing projects)
+    const activeLogs = useMemo(() => {
+        return logs; // Show all logs in history page, even if project deleted? Or filter. Let's show all.
+    }, [logs]);
 
     useEffect(() => {
-        if (!user) {
-            router.push('/');
-            return;
+        if (!loading && !user) {
+            router.push('/login');
         }
-        fetchData();
-    }, [user, router]);
+    }, [user, loading, router]);
 
-    if (!user) return null;
+    if (loading || !user) return null;
 
     return (
-        <Container maxWidth="md" sx={{ py: 4 }}>
+        <Container maxWidth="lg" sx={{ py: 4 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                <Typography variant="h4" fontWeight="bold">
+                    היסטוריית פעילות
+                </Typography>
+                <TimerDialogTrigger />
+            </Box>
 
-
-            <Box sx={{ mt: 4 }}>
-                <Timer
+            <Paper sx={{ p: 3, borderRadius: 3 }}>
+                <TimeLogList
+                    logs={activeLogs}
                     projects={projects}
                     userId={user.uid}
-                    onLogAdded={fetchData}
+                    onLogUpdated={refreshData}
                 />
-            </Box>
+            </Paper>
         </Container>
     );
 }
