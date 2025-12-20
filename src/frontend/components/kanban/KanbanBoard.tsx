@@ -182,19 +182,21 @@ export default function KanbanBoard({ tasks, userId, projectId, onTasksChange, o
             onDragOver={handleDragOver}
             onDragEnd={handleDragEnd}
         >
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} sx={{ height: '100%', alignItems: 'flex-start', direction: 'rtl' }}>
-                {columns.map((col) => (
-                    <KanbanColumn
-                        key={col.id}
-                        id={col.id}
-                        title={col.title}
-                        tasks={getTasksByStatus(col.id)}
-                        color={col.color}
-                        onEditTask={handleEditTaskClick}
-                        onAddTask={() => handleAddTaskClick(col.id)}
-                    />
-                ))}
-            </Stack>
+            <div dir="rtl" style={{ height: '100%' }}>
+                <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} sx={{ height: '100%', alignItems: 'flex-start' }}>
+                    {columns.map((col) => (
+                        <KanbanColumn
+                            key={col.id}
+                            id={col.id}
+                            title={col.title}
+                            tasks={getTasksByStatus(col.id)}
+                            color={col.color}
+                            onEditTask={handleEditTaskClick}
+                            onAddTask={() => handleAddTaskClick(col.id)}
+                        />
+                    ))}
+                </Stack>
+            </div>
 
             {createPortal(
                 <DragOverlay>

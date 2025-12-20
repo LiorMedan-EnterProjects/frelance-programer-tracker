@@ -10,7 +10,7 @@ interface DataContextType {
     tasks: Task[]; // Added tasks
     loading: boolean;
     refreshData: () => Promise<void>;
-    createNewProject: (project: Omit<Project, 'id' | 'createdAt' | 'userId'>) => Promise<void>;
+    createNewProject: (project: Omit<Project, 'id' | 'createdAt' | 'userId'>) => Promise<string | undefined>;
     createNewTimeLog: (log: Omit<TimeLog, 'id' | 'createdAt' | 'userId'>) => Promise<void>;
 }
 
@@ -61,7 +61,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }, [user]);
 
     const createNewProject = async (projectData: Omit<Project, 'id' | 'createdAt' | 'userId'>) => {
-        if (!user) return;
+        if (!user) return undefined;
 
         // Optimistic Update
         const tempId = `temp-${Date.now()}`;
@@ -87,6 +87,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
             console.log("createNewProject: Refreshing data..."); // DEBUG
             await refreshData();
             console.log("createNewProject: Refresh complete."); // DEBUG
+            return newId;
         } catch (error) {
             console.error("Error creating project:", error);
             // Rollback

@@ -13,19 +13,23 @@ import {
     Select,
     MenuItem,
     CircularProgress,
-    Alert
+    Alert,
+    Button
 } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 import KanbanBoard from '@/frontend/components/kanban/KanbanBoard';
+import ProjectModal from '@/frontend/components/projects/ProjectModal';
 import { Task, getProjectTasks, addTask, updateTaskStatus, deleteTask, updateTask } from '@/backend/firestore';
 
 export default function KanbanPage() {
     const { user, loading } = useAuth();
-    const { projects } = useData();
+    const { projects, createNewProject } = useData();
     const router = useRouter();
 
     const [selectedProjectId, setSelectedProjectId] = useState<string>('');
     const [tasks, setTasks] = useState<Task[]>([]);
     const [isLoadingTasks, setIsLoadingTasks] = useState(false);
+    const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
     useEffect(() => {
         if (!loading && !user) {
@@ -94,6 +98,18 @@ export default function KanbanPage() {
         }
     };
 
+    const handleCreateProject = async (projectData: any) => {
+        try {
+            const newProjectId = await createNewProject(projectData);
+            setIsProjectModalOpen(false);
+            if (newProjectId) {
+                setSelectedProjectId(newProjectId); // Auto-select new project
+            }
+        } catch (error) {
+            console.error("Error creating project:", error);
+        }
+    };
+
     if (loading) return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
             <CircularProgress />
@@ -102,21 +118,37 @@ export default function KanbanPage() {
 
     return (
         <Container maxWidth="xl" sx={{ py: 4, height: 'calc(100vh - 80px)' }}> {/* Full height minus header approx */}
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h4" fontWeight="bold">לוח משימות</Typography>
-
-                <FormControl sx={{ minWidth: 250 }}>
-                    <InputLabel>בחר פרויקט</InputLabel>
-                    <Select
-                        value={selectedProjectId}
-                        label="בחר פרויקט"
-                        onChange={(e) => setSelectedProjectId(e.target.value)}
+            <Box sx={{ mb: 4, display: 'grid', gridTemplateColumns: '250px 1fr 250px', alignItems: 'center', gap: 2, direction: 'rtl' }}>
+                {/* Right Side (Start in RTL) - Empty or Spacer */}
+                <Box sx={{ display: 'flex' }}>
+                    <Button
+                        startIcon={<AddIcon />}
+                        onClick={() => setIsProjectModalOpen(true)}
+                        variant="outlined"
+                        size="small"
                     >
-                        {projects.map((p) => (
-                            <MenuItem key={p.id} value={p.id}>{p.name}</MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
+                        פרויקט חדש
+                    </Button>
+                </Box>
+
+                {/* Center Title */}
+                <Typography variant="h4" fontWeight="bold" align="center">לוח משימות</Typography>
+
+                {/* Left Side (End in RTL) - Select */}
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <FormControl sx={{ minWidth: 250, maxWidth: '100%' }}>
+                        <InputLabel>בחר פרויקט</InputLabel>
+                        <Select
+                            value={selectedProjectId}
+                            label="בחר פרויקט"
+                            onChange={(e) => setSelectedProjectId(e.target.value)}
+                        >
+                            {projects.map((p) => (
+                                <MenuItem key={p.id} value={p.id}>{p.name}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Box>
             </Box>
 
             {selectedProjectId ? (
@@ -143,6 +175,12 @@ export default function KanbanPage() {
                     </Typography>
                 </Box>
             )}
+
+            <ProjectModal
+                open={isProjectModalOpen}
+                onClose={() => setIsProjectModalOpen(false)}
+                onSave={handleCreateProject}
+            />
         </Container>
     );
 }
